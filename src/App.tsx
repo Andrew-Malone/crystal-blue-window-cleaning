@@ -740,31 +740,31 @@ function About() {
           like our own.
         </h2>
         <p className="about-lede">
-          Crystal Blue is a small, owner-operated window cleaning service in the
-          greater Pensacola area. We show up on time, work clean, and leave your
-          glass streak-free — inside and out.
+          Crystal Blue is a small, owner-operated window cleaning service
+          based in the Pensacola area. We show up when we say we will and
+          clean every window inside and out, not just the easy half.
         </p>
 
         <div className="about-grid">
           <div className="about-point">
-            <h3>Streak-free, every visit</h3>
+            <h3>Purified water, no streaks</h3>
             <p>
-              Purified water and proper technique mean no spots, no film, no
-              residue — just clear glass that stays clear longer.
+              We use a purified-water system, so glass dries clear on its own
+              without wiping down spots or film afterward.
             </p>
           </div>
           <div className="about-point">
-            <h3>Homes &amp; small businesses</h3>
+            <h3>Houses and storefronts</h3>
             <p>
-              From single-story houses to storefronts, we handle exterior-only
-              or full inside-and-out cleans on your schedule.
+              Single-story homes, two-story homes, small storefronts — we
+              quote exterior-only or full inside-and-out cleans either way.
             </p>
           </div>
           <div className="about-point">
-            <h3>Licensed, insured, local</h3>
+            <h3>Licensed and insured</h3>
             <p>
-              You're dealing with neighbors, not a franchise. Every quote is
-              honest and every job is backed by us directly.
+              We're local, not a franchise call center. You talk to the
+              person who's actually doing the work.
             </p>
           </div>
         </div>
