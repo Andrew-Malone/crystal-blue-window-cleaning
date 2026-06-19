@@ -49,21 +49,18 @@ function QuoteForm() {
 function Hero() {
   return (
     <header className="hero" style={{ "--vista": `url(${vistaUrl})` } as CSSProperties}>
-      <nav className="topbar" aria-label="Main navigation">
-        <a className="brand" href="#top" aria-label="Crystal Blue Window Cleaning home">
-          <span className="brand-mark" aria-hidden="true">CB</span>
-          <span>
-            Crystal Blue
-            <small>Window Cleaning</small>
-          </span>
-        </a>
-      </nav>
-
       <div className="hero-copy">
-        <h1>
+        <h2>
           <span>Let the light</span>
           <span>back in.</span>
-        </h1>
+        </h2>
+      </div>
+
+      <div className="brand-lockup">
+        <div className="brand-line">
+          <span className="brand-mark" aria-hidden="true">CB</span>
+          <h1>Crystal Blue Window Cleaning</h1>
+        </div>
         <p>
           Simple, streak-free window cleaning for brighter homes and clearer
           views.
