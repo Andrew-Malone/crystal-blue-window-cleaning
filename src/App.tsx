@@ -262,7 +262,10 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
       const rect = canvas.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // The grime layer is procedural noise (smudges, water spots), so the
+      // jump from 1.5x to 2x is imperceptible on it while costing ~44% more
+      // pixel work per frame. Cap at 1.5 for this decorative overlay.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvasWidth = w;
       canvasHeight = h;
       canvas.width = Math.round(w * dpr);
@@ -320,6 +323,25 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
       fctx.fillRect(0, 0, featherWidth, featherHeight);
 
       let startTime = 0;
+      // The reveal is monotonic: everything behind `cleanEdge` is permanently
+      // transparent and everything ahead is the static grime bitmap, drawn once
+      // below. Only the strip swept since the last frame actually changes, so we
+      // clip every per-frame repaint to a band that spans from the previous
+      // clean edge to just past the current feather + squeegee. Output is
+      // pixel-identical to a full repaint (the grime is a constant bitmap drawn
+      // at the same position), but the per-frame fill shrinks from the whole
+      // canvas to that band. `bandPad` covers the squeegee strokes that ride
+      // ahead of the feather plus a margin for the clip's antialiased edge.
+      const bandPad = 64;
+      const c = Math.SQRT1_2; // cos(45deg) === sin(45deg)
+      // rotated-frame (x along the wipe direction) -> base canvas coords
+      const toBaseX = (x: number, y: number) => c * (x - y);
+      const toBaseY = (x: number, y: number) => c * (x + y);
+      let prevCleanEdge = -span * 2;
+
+      // initial pristine grime — drawn once; later frames only patch the band
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(grime, 0, 0, w, h);
 
       const frame = (now: number) => {
         if (token !== runToken) {
@@ -330,24 +352,40 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
         const elapsed = now - startTime - delay;
         const p = elapsed <= 0 ? 0 : Math.min(elapsed / duration, 1);
         const T = tStart + (tEnd - tStart) * ease(p);
+        const cleanEdge = (T - featherT) / Math.SQRT2;
 
-        // repaint pristine grime, then cut away the clean side in a single pass
-        // (feathered blade edge). Non-cumulative, so it always ends fully clean.
+        // band along the wipe direction: [bx0, bx1] x [-span, span] (rotated)
+        const bx0 = prevCleanEdge - bandPad;
+        const bx1 = cleanEdge + featherWidth + bandPad;
+
+        ctx.save();
+        // clip to the rotated band, expressed as a polygon in base coords so we
+        // can draw the (axis-aligned) grime without churning the transform
+        ctx.beginPath();
+        ctx.moveTo(toBaseX(bx0, -span), toBaseY(bx0, -span));
+        ctx.lineTo(toBaseX(bx1, -span), toBaseY(bx1, -span));
+        ctx.lineTo(toBaseX(bx1, span), toBaseY(bx1, span));
+        ctx.lineTo(toBaseX(bx0, span), toBaseY(bx0, span));
+        ctx.closePath();
+        ctx.clip();
+
+        // rebuild the band from scratch: pristine grime, then cut the clean side
+        // in a single pass (feathered blade edge) — non-cumulative within the
+        // band, so it always resolves fully clean.
         ctx.clearRect(0, 0, w, h);
         ctx.drawImage(grime, 0, 0, w, h);
 
         ctx.globalCompositeOperation = "destination-out";
-        const cleanEdge = (T - featherT) / Math.SQRT2;
-        ctx.save();
         ctx.rotate(Math.PI / 4);
         ctx.fillStyle = "rgba(0, 0, 0, 1)";
         ctx.fillRect(-span * 2, -span, span * 2 + cleanEdge, featherHeight);
         ctx.drawImage(feather, cleanEdge, -span, featherWidth, featherHeight);
-        ctx.restore();
         ctx.globalCompositeOperation = "source-over";
+        ctx.restore();
 
         if (p < 1) {
           paintSqueegee(T - 80);
+          prevCleanEdge = cleanEdge;
           raf = requestAnimationFrame(frame);
         } else {
           hasFinished = true;
