@@ -262,6 +262,24 @@ function WindowWipe() {
     const dir: Pt = { x: Math.SQRT1_2, y: Math.SQRT1_2 };
     const ease = cubicBezier(0.72, 0, 0.2, 1);
     const paintSqueegee = makeSqueegeePainter(ctx, dir, span);
+    const featherWidth = featherT / Math.SQRT2;
+    const featherHeight = span * 2;
+    const feather = document.createElement("canvas");
+    feather.width = Math.ceil(featherWidth * dpr);
+    feather.height = Math.ceil(featherHeight * dpr);
+    const fctx = feather.getContext("2d");
+
+    if (!fctx) {
+      setDone(true);
+      return;
+    }
+
+    fctx.scale(dpr, dpr);
+    const featherFade = fctx.createLinearGradient(0, 0, featherWidth, 0);
+    featherFade.addColorStop(0, "rgba(0, 0, 0, 1)");
+    featherFade.addColorStop(1, "rgba(0, 0, 0, 0)");
+    fctx.fillStyle = featherFade;
+    fctx.fillRect(0, 0, featherWidth, featherHeight);
 
     let raf = 0;
     let startTime = 0;
@@ -278,13 +296,13 @@ function WindowWipe() {
       ctx.drawImage(grime, 0, 0, w, h);
 
       ctx.globalCompositeOperation = "destination-out";
-      const e0 = (T - featherT) / 2;
-      const e1 = T / 2;
-      const grad = ctx.createLinearGradient(e0, e0, e1, e1);
-      grad.addColorStop(0, "rgba(0, 0, 0, 1)");
-      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+      const cleanEdge = (T - featherT) / Math.SQRT2;
+      ctx.save();
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = "rgba(0, 0, 0, 1)";
+      ctx.fillRect(-span * 2, -span, span * 2 + cleanEdge, featherHeight);
+      ctx.drawImage(feather, cleanEdge, -span, featherWidth, featherHeight);
+      ctx.restore();
       ctx.globalCompositeOperation = "source-over";
 
       if (p < 1) {

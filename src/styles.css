@@ -190,9 +190,11 @@ textarea {
   backdrop-filter: blur(22px) saturate(150%);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
   /* Entrance lives on the card itself (its own transform doesn't disable its
-     backdrop-filter) and eases the blur in so the frost doesn't snap on. */
+     backdrop-filter). Keep the glass blur static; animating backdrop-filter is
+     costly in Chrome and can make the card hitch as it appears. */
   opacity: 0;
   transform: translateY(38px);
+  will-change: opacity, transform;
   animation: quoteEnter 0.85s ease 2.35s both;
   box-shadow:
     0 24px 80px rgba(1, 30, 45, 0.32),
@@ -445,14 +447,10 @@ button:disabled {
   from {
     opacity: 0;
     transform: translateY(38px);
-    backdrop-filter: blur(0) saturate(120%);
-    -webkit-backdrop-filter: blur(0) saturate(120%);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    backdrop-filter: blur(22px) saturate(150%);
-    -webkit-backdrop-filter: blur(22px) saturate(150%);
   }
 }
 
@@ -613,5 +611,6 @@ button:disabled {
   .quote-card {
     opacity: 1;
     transform: none;
+    will-change: auto;
   }
 }
