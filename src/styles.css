@@ -108,9 +108,8 @@ textarea {
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.76);
   border-radius: 8px;
-  background: rgba(236, 251, 255, 0.22);
+  background: rgba(236, 251, 255, 0.32);
   box-shadow: inset 0 1px 18px rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(14px);
 }
 
 .hero-copy {
@@ -158,6 +157,7 @@ textarea {
 .window-scene {
   z-index: 2;
   overflow: hidden;
+  contain: paint;
 }
 
 .glass-haze {
@@ -170,9 +170,10 @@ textarea {
     radial-gradient(circle at 64% 84%, rgba(255, 255, 255, 0.14) 0 3px, transparent 17px),
     linear-gradient(180deg, rgba(224, 227, 226, 0.5), rgba(165, 174, 176, 0.42));
   background-size: 100% 100%;
-  filter: blur(0.45px);
   opacity: 0.92;
   mask-image: linear-gradient(315deg, #000 0 calc(var(--dust-wipe) - 12%), rgba(0, 0, 0, 0.62) calc(var(--dust-wipe) - 4%), transparent calc(var(--dust-wipe) + 7%) 100%);
+  transform: translateZ(0);
+  will-change: mask-image, opacity;
   animation: dustWipe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.25s forwards;
 }
 
@@ -182,9 +183,10 @@ textarea {
     radial-gradient(ellipse at 58% 54%, rgba(69, 80, 84, 0.18), transparent 34%),
     radial-gradient(ellipse at 84% 34%, rgba(255, 255, 255, 0.16), transparent 22%),
     linear-gradient(180deg, rgba(226, 229, 228, 0.58), rgba(137, 149, 153, 0.48));
-  backdrop-filter: grayscale(0.62) blur(3px) brightness(0.8) contrast(0.86);
   opacity: 0.9;
   mask-image: linear-gradient(315deg, #000 0 calc(var(--dust-wipe) - 12%), rgba(0, 0, 0, 0.62) calc(var(--dust-wipe) - 4%), transparent calc(var(--dust-wipe) + 7%) 100%);
+  transform: translateZ(0);
+  will-change: mask-image, opacity;
   animation: dustWipe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.25s forwards;
 }
 
@@ -209,6 +211,8 @@ textarea {
   background:
     linear-gradient(315deg, transparent 0 calc(var(--dust-wipe) - 7%), rgba(255, 255, 255, 0.72) calc(var(--dust-wipe) - 1%), rgba(255, 255, 255, 0.38) calc(var(--dust-wipe) + 4%), transparent calc(var(--dust-wipe) + 10%) 100%);
   opacity: 0;
+  transform: translateZ(0);
+  will-change: background, opacity;
   animation: cleanStripe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.25s forwards;
 }
 
@@ -229,9 +233,8 @@ textarea {
   padding: clamp(18px, 3vw, 28px);
   border: 1px solid rgba(255, 255, 255, 0.78);
   border-radius: 8px;
-  background: rgba(241, 253, 255, 0.82);
+  background: rgba(241, 253, 255, 0.9);
   box-shadow: 0 24px 80px rgba(1, 30, 45, 0.25);
-  backdrop-filter: blur(20px);
 }
 
 .quote-card h2 {
