@@ -57,8 +57,6 @@ textarea {
   z-index: -2;
   content: "";
   background: var(--vista) center / cover no-repeat;
-  transform: scale(1.02);
-  animation: tideDrift 18s ease-in-out infinite alternate;
 }
 
 .hero::after {
@@ -203,6 +201,10 @@ textarea {
     inset 0 -1px 0 rgba(1, 30, 45, 0.18),
     inset -1px 0 0 rgba(1, 30, 45, 0.1);
   overflow: hidden;
+}
+
+.quote-card.is-entered {
+  will-change: auto;
 }
 
 .quote-card h2 {
@@ -432,15 +434,6 @@ button:disabled {
   cursor: not-allowed;
   box-shadow: none;
   filter: none;
-}
-
-@keyframes tideDrift {
-  from {
-    transform: scale(1.02) translate3d(-0.4%, -0.2%, 0);
-  }
-  to {
-    transform: scale(1.06) translate3d(0.7%, 0.3%, 0);
-  }
 }
 
 @keyframes quoteEnter {

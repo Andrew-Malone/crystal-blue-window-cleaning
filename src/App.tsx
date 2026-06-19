@@ -3,6 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type AnimationEvent,
   type CSSProperties,
   type FormEvent,
 } from "react";
@@ -210,7 +211,24 @@ function makeSqueegeePainter(
   };
 }
 
-function WindowWipe() {
+function decodeImage(src: string) {
+  return new Promise<void>((resolve) => {
+    const img = new Image();
+    img.src = src;
+
+    if (img.complete) {
+      void (img.decode?.() ?? Promise.resolve()).finally(resolve);
+      return;
+    }
+
+    img.onload = () => {
+      void (img.decode?.() ?? Promise.resolve()).finally(resolve);
+    };
+    img.onerror = () => resolve();
+  });
+}
+
+function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [done, setDone] = useState(false);
 
@@ -229,94 +247,145 @@ function WindowWipe() {
       return;
     }
 
-    const rect = canvas.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    ctx.scale(dpr, dpr);
-
-    // offscreen grime layer — drawn once, only ever erased (so no residue)
-    const grime = document.createElement("canvas");
-    grime.width = canvas.width;
-    grime.height = canvas.height;
-    const gctx = grime.getContext("2d");
-    if (!gctx) {
-      setDone(true);
-      return;
-    }
-    gctx.scale(dpr, dpr);
-    drawGrime(gctx, w, h);
-
-    // paint the initial dirty state before the browser shows the frame
-    ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(grime, 0, 0, w, h);
-
-    const featherT = 150;
-    const tStart = -featherT;
-    const tEnd = w + h + featherT;
-    const duration = 2500;
-    const delay = 150;
-    const span = Math.hypot(w, h);
-    const dir: Pt = { x: Math.SQRT1_2, y: Math.SQRT1_2 };
-    const ease = cubicBezier(0.72, 0, 0.2, 1);
-    const paintSqueegee = makeSqueegeePainter(ctx, dir, span);
-    const featherWidth = featherT / Math.SQRT2;
-    const featherHeight = span * 2;
-    const feather = document.createElement("canvas");
-    feather.width = Math.ceil(featherWidth * dpr);
-    feather.height = Math.ceil(featherHeight * dpr);
-    const fctx = feather.getContext("2d");
-
-    if (!fctx) {
-      setDone(true);
-      return;
-    }
-
-    fctx.scale(dpr, dpr);
-    const featherFade = fctx.createLinearGradient(0, 0, featherWidth, 0);
-    featherFade.addColorStop(0, "rgba(0, 0, 0, 1)");
-    featherFade.addColorStop(1, "rgba(0, 0, 0, 0)");
-    fctx.fillStyle = featherFade;
-    fctx.fillRect(0, 0, featherWidth, featherHeight);
-
     let raf = 0;
-    let startTime = 0;
+    let resizeTimer = 0;
+    let runToken = 0;
+    let hasFinished = false;
+    let canvasWidth = 0;
+    let canvasHeight = 0;
 
-    const frame = (now: number) => {
-      if (!startTime) startTime = now;
-      const elapsed = now - startTime - delay;
-      const p = elapsed <= 0 ? 0 : Math.min(elapsed / duration, 1);
-      const T = tStart + (tEnd - tStart) * ease(p);
+    const startWipe = async () => {
+      const token = ++runToken;
+      cancelAnimationFrame(raf);
+      setDone(false);
 
-      // repaint pristine grime, then cut away the clean side in a single pass
-      // (feathered blade edge). Non-cumulative, so it always ends fully clean.
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvasWidth = w;
+      canvasHeight = h;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // offscreen grime layer — drawn once, only ever erased (so no residue)
+      const grime = document.createElement("canvas");
+      grime.width = canvas.width;
+      grime.height = canvas.height;
+      const gctx = grime.getContext("2d");
+      if (!gctx) {
+        setDone(true);
+        return;
+      }
+      gctx.scale(dpr, dpr);
+      drawGrime(gctx, w, h);
+
+      // paint the initial dirty state before the wipe starts moving
       ctx.clearRect(0, 0, w, h);
       ctx.drawImage(grime, 0, 0, w, h);
 
-      ctx.globalCompositeOperation = "destination-out";
-      const cleanEdge = (T - featherT) / Math.SQRT2;
-      ctx.save();
-      ctx.rotate(Math.PI / 4);
-      ctx.fillStyle = "rgba(0, 0, 0, 1)";
-      ctx.fillRect(-span * 2, -span, span * 2 + cleanEdge, featherHeight);
-      ctx.drawImage(feather, cleanEdge, -span, featherWidth, featherHeight);
-      ctx.restore();
-      ctx.globalCompositeOperation = "source-over";
+      await decodeImage(revealImageUrl);
 
-      if (p < 1) {
-        paintSqueegee(T - 80);
-        raf = requestAnimationFrame(frame);
-      } else {
-        ctx.clearRect(0, 0, w, h);
-        setDone(true);
+      if (token !== runToken) {
+        return;
       }
+
+      const featherT = 150;
+      const tStart = -featherT;
+      const tEnd = w + h + featherT;
+      const duration = 2500;
+      const delay = 150;
+      const span = Math.hypot(w, h);
+      const dir: Pt = { x: Math.SQRT1_2, y: Math.SQRT1_2 };
+      const ease = cubicBezier(0.72, 0, 0.2, 1);
+      const paintSqueegee = makeSqueegeePainter(ctx, dir, span);
+      const featherWidth = featherT / Math.SQRT2;
+      const featherHeight = span * 2;
+      const feather = document.createElement("canvas");
+      feather.width = Math.ceil(featherWidth * dpr);
+      feather.height = Math.ceil(featherHeight * dpr);
+      const fctx = feather.getContext("2d");
+
+      if (!fctx) {
+        setDone(true);
+        return;
+      }
+
+      fctx.scale(dpr, dpr);
+      const featherFade = fctx.createLinearGradient(0, 0, featherWidth, 0);
+      featherFade.addColorStop(0, "rgba(0, 0, 0, 1)");
+      featherFade.addColorStop(1, "rgba(0, 0, 0, 0)");
+      fctx.fillStyle = featherFade;
+      fctx.fillRect(0, 0, featherWidth, featherHeight);
+
+      let startTime = 0;
+
+      const frame = (now: number) => {
+        if (token !== runToken) {
+          return;
+        }
+
+        if (!startTime) startTime = now;
+        const elapsed = now - startTime - delay;
+        const p = elapsed <= 0 ? 0 : Math.min(elapsed / duration, 1);
+        const T = tStart + (tEnd - tStart) * ease(p);
+
+        // repaint pristine grime, then cut away the clean side in a single pass
+        // (feathered blade edge). Non-cumulative, so it always ends fully clean.
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(grime, 0, 0, w, h);
+
+        ctx.globalCompositeOperation = "destination-out";
+        const cleanEdge = (T - featherT) / Math.SQRT2;
+        ctx.save();
+        ctx.rotate(Math.PI / 4);
+        ctx.fillStyle = "rgba(0, 0, 0, 1)";
+        ctx.fillRect(-span * 2, -span, span * 2 + cleanEdge, featherHeight);
+        ctx.drawImage(feather, cleanEdge, -span, featherWidth, featherHeight);
+        ctx.restore();
+        ctx.globalCompositeOperation = "source-over";
+
+        if (p < 1) {
+          paintSqueegee(T - 80);
+          raf = requestAnimationFrame(frame);
+        } else {
+          hasFinished = true;
+          ctx.clearRect(0, 0, w, h);
+          setDone(true);
+        }
+      };
+
+      raf = requestAnimationFrame(frame);
     };
 
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
-  }, []);
+    const resizeObserver = new ResizeObserver(() => {
+      if (hasFinished) {
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      if (
+        Math.abs(rect.width - canvasWidth) < 1 &&
+        Math.abs(rect.height - canvasHeight) < 1
+      ) {
+        return;
+      }
+
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(startWipe, 120);
+    });
+
+    resizeObserver.observe(canvas);
+    void startWipe();
+
+    return () => {
+      runToken += 1;
+      resizeObserver.disconnect();
+      window.clearTimeout(resizeTimer);
+      cancelAnimationFrame(raf);
+    };
+  }, [revealImageUrl]);
 
   return (
     <canvas
@@ -331,6 +400,7 @@ function QuoteForm() {
   const [step, setStep] = useState(1);
   const [stepHeight, setStepHeight] = useState<number>();
   const [flashFields, setFlashFields] = useState<string[]>([]);
+  const [cardEntered, setCardEntered] = useState(false);
   const stepContentRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
     windowCount: "",
@@ -392,6 +462,12 @@ function QuoteForm() {
     event.preventDefault();
   };
 
+  const handleCardAnimationEnd = (event: AnimationEvent<HTMLFormElement>) => {
+    if (event.animationName === "quoteEnter") {
+      setCardEntered(true);
+    }
+  };
+
   useLayoutEffect(() => {
     const content = stepContentRef.current;
 
@@ -403,7 +479,12 @@ function QuoteForm() {
   }, [estimateRange, step]);
 
   return (
-    <form className="quote-card" aria-label="Request a window cleaning quote" onSubmit={handleSubmit}>
+    <form
+      className={`quote-card${cardEntered ? " is-entered" : ""}`}
+      aria-label="Request a window cleaning quote"
+      onAnimationEnd={handleCardAnimationEnd}
+      onSubmit={handleSubmit}
+    >
       <div className="form-heading">
         <h2>Request a quote</h2>
         <div className="step-track" aria-label={`Step ${step} of 2`}>
@@ -587,7 +668,7 @@ function Hero() {
         </h1>
       </div>
 
-      <WindowWipe />
+      <WindowWipe revealImageUrl={vistaUrl} />
 
       <div id="quote" className="quote-shell">
         <QuoteForm />
