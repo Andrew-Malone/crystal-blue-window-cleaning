@@ -85,7 +85,7 @@ textarea {
 
 .hero-copy {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   width: min(620px, calc(100% - 560px));
   margin-top: clamp(84px, 15vh, 150px);
   color: white;
@@ -108,7 +108,7 @@ textarea {
   position: absolute;
   left: clamp(18px, 5vw, 76px);
   bottom: clamp(22px, 7vh, 80px);
-  z-index: 4;
+  z-index: 2;
   width: min(520px, calc(100% - 560px));
   color: white;
   text-shadow: 0 2px 22px rgba(1, 30, 45, 0.42);
@@ -145,7 +145,7 @@ textarea {
 }
 
 .window-scene {
-  z-index: 2;
+  z-index: 3;
   overflow: hidden;
   contain: paint;
 }
@@ -186,20 +186,46 @@ textarea {
   content: "";
   background:
     radial-gradient(circle at 7% 49%, rgba(255, 255, 255, 0.22) 0 2px, transparent 6px),
+    radial-gradient(circle at 9% 18%, rgba(38, 47, 50, 0.13) 0 2px, transparent 8px),
+    radial-gradient(circle at 13% 67%, rgba(255, 255, 255, 0.17) 0 1px, transparent 5px),
     radial-gradient(circle at 18% 81%, rgba(34, 44, 47, 0.16) 0 3px, transparent 9px),
+    radial-gradient(circle at 23% 38%, rgba(42, 50, 53, 0.14) 0 3px, transparent 10px),
+    radial-gradient(circle at 27% 57%, rgba(255, 255, 255, 0.15) 0 2px, transparent 7px),
     radial-gradient(circle at 31% 22%, rgba(255, 255, 255, 0.2) 0 1px, transparent 5px),
     radial-gradient(circle at 38% 87%, rgba(255, 255, 255, 0.16) 0 2px, transparent 7px),
+    radial-gradient(circle at 41% 12%, rgba(255, 255, 255, 0.13) 0 2px, transparent 8px),
     radial-gradient(circle at 46% 63%, rgba(38, 47, 50, 0.17) 0 2px, transparent 7px),
     radial-gradient(circle at 54% 17%, rgba(40, 49, 52, 0.13) 0 2px, transparent 8px),
+    radial-gradient(circle at 58% 73%, rgba(35, 44, 47, 0.15) 0 3px, transparent 10px),
+    radial-gradient(circle at 62% 29%, rgba(255, 255, 255, 0.16) 0 1px, transparent 6px),
     radial-gradient(circle at 67% 38%, rgba(255, 255, 255, 0.18) 0 3px, transparent 10px),
     radial-gradient(circle at 72% 58%, rgba(255, 255, 255, 0.14) 0 1px, transparent 6px),
+    radial-gradient(circle at 76% 12%, rgba(39, 48, 51, 0.13) 0 2px, transparent 8px),
     radial-gradient(circle at 79% 86%, rgba(36, 45, 48, 0.14) 0 2px, transparent 8px),
     radial-gradient(circle at 84% 43%, rgba(36, 45, 48, 0.12) 0 3px, transparent 11px),
+    radial-gradient(circle at 87% 64%, rgba(255, 255, 255, 0.14) 0 2px, transparent 7px),
     radial-gradient(circle at 91% 16%, rgba(255, 255, 255, 0.2) 0 1px, transparent 6px),
     radial-gradient(circle at 94% 72%, rgba(255, 255, 255, 0.15) 0 2px, transparent 9px),
+    radial-gradient(circle at 96% 32%, rgba(41, 50, 53, 0.13) 0 2px, transparent 8px),
     radial-gradient(ellipse at 56% 44%, rgba(44, 53, 56, 0.12) 0 8px, transparent 30px);
   background-size: 100% 100%;
-  opacity: 0.86;
+  opacity: 0.95;
+}
+
+.dirty-glass::after {
+  position: absolute;
+  inset: -4%;
+  content: "";
+  background:
+    radial-gradient(circle at 5% 76%, rgba(255, 255, 255, 0.12) 0 1px, transparent 5px),
+    radial-gradient(circle at 16% 29%, rgba(43, 52, 55, 0.11) 0 2px, transparent 7px),
+    radial-gradient(circle at 24% 91%, rgba(255, 255, 255, 0.14) 0 2px, transparent 8px),
+    radial-gradient(circle at 36% 47%, rgba(36, 45, 48, 0.12) 0 1px, transparent 6px),
+    radial-gradient(circle at 49% 79%, rgba(255, 255, 255, 0.13) 0 2px, transparent 7px),
+    radial-gradient(circle at 69% 21%, rgba(35, 44, 47, 0.11) 0 2px, transparent 8px),
+    radial-gradient(circle at 82% 7%, rgba(255, 255, 255, 0.12) 0 1px, transparent 5px),
+    radial-gradient(circle at 93% 92%, rgba(37, 46, 49, 0.1) 0 2px, transparent 8px);
+  opacity: 0.9;
 }
 
 .clean-swipe {
@@ -215,7 +241,7 @@ textarea {
   position: absolute;
   right: clamp(18px, 5vw, 76px);
   top: 50%;
-  z-index: 4;
+  z-index: 5;
   width: min(440px, calc(100% - 36px));
   opacity: 0;
   transform: translateY(calc(-50% + 38px));
