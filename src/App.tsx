@@ -7,7 +7,7 @@ import {
   type FormEvent,
 } from "react";
 import logoMarkUrl from "./assets/crystal-blue-mark.svg";
-import vistaUrl from "./assets/gulf-coast-vista.png";
+import vistaUrl from "./assets/gulf-coast-vista.webp";
 
 type Pt = { x: number; y: number };
 
@@ -567,10 +567,6 @@ function Hero() {
           <br />
           back in.
         </h1>
-        <p className="lede">
-          Simple, streak-free window cleaning for brighter homes and clearer
-          views.
-        </p>
       </div>
 
       <WindowWipe />
@@ -582,6 +578,55 @@ function Hero() {
   );
 }
 
+function About() {
+  return (
+    <section id="about" className="about" aria-label="About Crystal Blue Window Cleaning">
+      <div className="about-inner">
+        <p className="about-eyebrow">About us</p>
+        <h2>
+          A local crew that treats your windows
+          <br />
+          like our own.
+        </h2>
+        <p className="about-lede">
+          Crystal Blue is a small, owner-operated window cleaning service in the
+          greater Pensacola area. We show up on time, work clean, and leave your
+          glass streak-free — inside and out.
+        </p>
+
+        <div className="about-grid">
+          <div className="about-point">
+            <h3>Streak-free, every visit</h3>
+            <p>
+              Purified water and proper technique mean no spots, no film, no
+              residue — just clear glass that stays clear longer.
+            </p>
+          </div>
+          <div className="about-point">
+            <h3>Homes &amp; small businesses</h3>
+            <p>
+              From single-story houses to storefronts, we handle exterior-only
+              or full inside-and-out cleans on your schedule.
+            </p>
+          </div>
+          <div className="about-point">
+            <h3>Licensed, insured, local</h3>
+            <p>
+              You're dealing with neighbors, not a franchise. Every quote is
+              honest and every job is backed by us directly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
-  return <Hero />;
+  return (
+    <>
+      <Hero />
+      <About />
+    </>
+  );
 }
