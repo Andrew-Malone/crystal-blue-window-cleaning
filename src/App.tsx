@@ -7,7 +7,7 @@ import {
   type FormEvent,
 } from "react";
 import logoMarkUrl from "./assets/crystal-blue-mark.svg";
-import vistaUrl from "./assets/gulf-coast-vista.png";
+import vistaUrl from "./assets/gulf-coast-vista-beach.png";
 
 function QuoteForm() {
   const [step, setStep] = useState(1);
@@ -141,7 +141,6 @@ function QuoteForm() {
             </>
           ) : (
             <>
-              <p className="range-note">{estimateRange}</p>
               <div className="field-grid">
                 <label>
                   <span>First name</span>
