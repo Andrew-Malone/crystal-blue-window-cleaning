@@ -1,6 +1,9 @@
 :root {
   color: #08283a;
-  background: #eef9fc;
+  /* Matches .hero's solid fallback so iOS's rubber-band bounce at the top
+     (right under the translucent address bar) doesn't flash a contrasting
+     color against the dark hero photo. */
+  background: #0a1418;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -21,12 +24,14 @@
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior-y: none;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
 a {
