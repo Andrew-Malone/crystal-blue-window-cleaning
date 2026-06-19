@@ -118,6 +118,7 @@ function makeSqueegeePainter(
   ctx: CanvasRenderingContext2D,
   dir: Pt,
   span: number,
+  simplified: boolean,
 ) {
   const ang = Math.atan2(dir.y, dir.x);
   const k = 1 / Math.SQRT2; // px along `dir` per unit of diagonal projection T
@@ -176,12 +177,16 @@ function makeSqueegeePainter(
     ctx.lineCap = "round";
 
     // soft drop shadow, offset toward the dirty side (no shadowBlur)
-    blade(shadowX, 22, "rgba(2, 24, 36, 0.16)");
+    blade(shadowX, simplified ? 16 : 22, "rgba(2, 24, 36, 0.16)");
 
-    // wet gleam at the cleaned contact line — stacked strokes fake the glow
-    blade(gleamX, 14, "rgba(255, 255, 255, 0.12)");
-    blade(gleamX, 7, "rgba(255, 255, 255, 0.3)");
-    blade(gleamX, 3, "rgba(255, 255, 255, 0.6)");
+    // wet gleam at the cleaned contact line — stacked strokes fake the glow.
+    // On mobile Safari, skip the stacked highlight strokes; the moving blade is
+    // still clear, but per-frame full-length strokes drop from six to three.
+    if (!simplified) {
+      blade(gleamX, 14, "rgba(255, 255, 255, 0.12)");
+      blade(gleamX, 7, "rgba(255, 255, 255, 0.3)");
+      blade(gleamX, 3, "rgba(255, 255, 255, 0.6)");
+    }
 
     // metal channel + rubber blade
     blade(0, cw, metal);
@@ -304,7 +309,7 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
       const span = Math.hypot(w, h);
       const dir: Pt = { x: Math.SQRT1_2, y: Math.SQRT1_2 };
       const ease = cubicBezier(0.72, 0, 0.2, 1);
-      const paintSqueegee = makeSqueegeePainter(ctx, dir, span);
+      const paintSqueegee = makeSqueegeePainter(ctx, dir, span, isCoarsePointer);
       const featherWidth = featherT / Math.SQRT2;
       const featherHeight = span * 2;
       const feather = document.createElement("canvas");
