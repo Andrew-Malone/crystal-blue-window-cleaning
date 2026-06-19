@@ -439,7 +439,6 @@ function QuoteForm() {
     form.firstName.trim() !== "" &&
     form.lastName.trim() !== "" &&
     form.phone.trim() !== "" &&
-    form.email.trim() !== "" &&
     form.streetAddress.trim() !== "" &&
     form.desiredDate !== "";
 
@@ -621,7 +620,7 @@ function QuoteForm() {
                   />
                 </label>
                 <label>
-                  <span>Email</span>
+                  <span>Email (optional)</span>
                   <input
                     name="email"
                     type="email"

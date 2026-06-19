@@ -575,6 +575,9 @@ button:disabled {
     order: 2;
     width: min(500px, 100%);
     margin: 32px 0 0;
+    opacity: 0;
+    transform: translateY(38px);
+    animation: quoteEnter 0.85s ease 2.35s both;
   }
 
   .quote-shell {
@@ -634,7 +637,8 @@ button:disabled {
     scroll-behavior: auto !important;
   }
 
-  .quote-card {
+  .quote-card,
+  .locale {
     opacity: 1;
     transform: none;
     will-change: auto;
