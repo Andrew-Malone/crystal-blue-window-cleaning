@@ -214,17 +214,17 @@ textarea {
 .quote-shell {
   position: absolute;
   right: clamp(18px, 5vw, 76px);
-  bottom: clamp(22px, 7vh, 80px);
+  top: 50%;
   z-index: 4;
   width: min(440px, calc(100% - 36px));
   opacity: 0;
-  transform: translateY(38px);
+  transform: translateY(calc(-50% + 38px));
   animation: quoteEnter 0.74s ease 2.35s forwards;
 }
 
 .quote-card {
   display: grid;
-  gap: 14px;
+  gap: 18px;
   padding: clamp(18px, 3vw, 28px);
   border: 1px solid rgba(255, 255, 255, 0.78);
   border-radius: 8px;
@@ -239,21 +239,90 @@ textarea {
   line-height: 1;
 }
 
+.form-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.form-heading span {
+  color: #4f7a8b;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.step-frame {
+  overflow: hidden;
+  transition: height 280ms ease;
+}
+
+.step-content {
+  display: grid;
+  gap: 18px;
+  animation: stepContentEnter 220ms ease both;
+}
+
+.range-note {
+  margin: 0;
+  color: #416b7c;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.range-note {
+  color: #164a60;
+  font-weight: 800;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 label {
   display: grid;
-  gap: 7px;
+  gap: 8px;
   color: #17475b;
   font-size: 0.82rem;
   font-weight: 800;
 }
 
+.service-field {
+  display: grid;
+  gap: 8px;
+  color: #17475b;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.segmented-control {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.segmented-control button {
+  min-height: 48px;
+  border: 1px solid rgba(8, 74, 103, 0.2);
+  background: rgba(255, 255, 255, 0.72);
+  color: #17475b;
+  box-shadow: none;
+}
+
+.segmented-control button.is-selected {
+  border-color: rgba(8, 126, 164, 0.8);
+  background: linear-gradient(135deg, rgba(8, 126, 164, 0.92), rgba(18, 166, 202, 0.92));
+  color: white;
+  box-shadow: 0 10px 20px rgba(7, 103, 137, 0.18);
+}
+
 input,
+select,
 textarea {
   width: 100%;
   border: 1px solid rgba(8, 74, 103, 0.2);
@@ -264,7 +333,12 @@ textarea {
 }
 
 input {
-  height: 43px;
+  height: 48px;
+  padding: 0 12px;
+}
+
+select {
+  height: 48px;
   padding: 0 12px;
 }
 
@@ -275,9 +349,16 @@ textarea {
 }
 
 input:focus,
+select:focus,
 textarea:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(84, 211, 238, 0.32);
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.48fr) 1fr;
+  gap: 12px;
 }
 
 button {
@@ -291,8 +372,22 @@ button {
   box-shadow: 0 14px 28px rgba(7, 103, 137, 0.22);
 }
 
+.secondary-button {
+  background: rgba(7, 64, 87, 0.12);
+  color: #164a60;
+  box-shadow: none;
+}
+
 button:hover {
   filter: brightness(1.05);
+}
+
+button:disabled {
+  background: linear-gradient(135deg, #9eadb3, #c3cfd3);
+  color: rgba(255, 255, 255, 0.86);
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
 }
 
 @keyframes tideDrift {
@@ -336,6 +431,17 @@ button:hover {
 @keyframes quoteEnter {
   to {
     opacity: 1;
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes stepContentEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -358,7 +464,6 @@ button:hover {
 
   .quote-shell {
     right: 18px;
-    bottom: 28px;
   }
 
 }
@@ -415,6 +520,6 @@ button:hover {
 
   .quote-shell {
     opacity: 1;
-    transform: none;
+    transform: translateY(-50%);
   }
 }
