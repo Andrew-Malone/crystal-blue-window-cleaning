@@ -131,10 +131,15 @@ textarea {
 }
 
 .hero-copy h1 {
-  max-width: 11ch;
+  max-width: 13ch;
   margin: 0;
   font-size: clamp(3.2rem, 8vw, 7.6rem);
   line-height: 0.86;
+}
+
+.hero-copy h1 span {
+  display: block;
+  white-space: nowrap;
 }
 
 .hero-copy p:last-child {
@@ -198,10 +203,15 @@ textarea {
     radial-gradient(circle at 7% 49%, rgba(255, 255, 255, 0.22) 0 2px, transparent 6px),
     radial-gradient(circle at 18% 81%, rgba(34, 44, 47, 0.16) 0 3px, transparent 9px),
     radial-gradient(circle at 31% 22%, rgba(255, 255, 255, 0.2) 0 1px, transparent 5px),
+    radial-gradient(circle at 38% 87%, rgba(255, 255, 255, 0.16) 0 2px, transparent 7px),
     radial-gradient(circle at 46% 63%, rgba(38, 47, 50, 0.17) 0 2px, transparent 7px),
+    radial-gradient(circle at 54% 17%, rgba(40, 49, 52, 0.13) 0 2px, transparent 8px),
     radial-gradient(circle at 67% 38%, rgba(255, 255, 255, 0.18) 0 3px, transparent 10px),
+    radial-gradient(circle at 72% 58%, rgba(255, 255, 255, 0.14) 0 1px, transparent 6px),
     radial-gradient(circle at 79% 86%, rgba(36, 45, 48, 0.14) 0 2px, transparent 8px),
+    radial-gradient(circle at 84% 43%, rgba(36, 45, 48, 0.12) 0 3px, transparent 11px),
     radial-gradient(circle at 91% 16%, rgba(255, 255, 255, 0.2) 0 1px, transparent 6px),
+    radial-gradient(circle at 94% 72%, rgba(255, 255, 255, 0.15) 0 2px, transparent 9px),
     radial-gradient(ellipse at 56% 44%, rgba(44, 53, 56, 0.12) 0 8px, transparent 30px);
   background-size: 100% 100%;
   opacity: 0.86;

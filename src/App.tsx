@@ -60,7 +60,10 @@ function Hero() {
       </nav>
 
       <div className="hero-copy">
-        <h1>Let the light back in.</h1>
+        <h1>
+          <span>Let the light</span>
+          <span>back in.</span>
+        </h1>
         <p>
           Simple, streak-free window cleaning for brighter homes and clearer
           views.
