@@ -283,6 +283,23 @@ textarea {
   line-height: 1.45;
 }
 
+.form-status {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(8, 74, 103, 0.2);
+  color: #164a60;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.form-status--error {
+  border-color: rgba(211, 58, 48, 0.35);
+  color: #b3261e;
+}
+
 .step-content > button {
   margin-top: 6px;
 }

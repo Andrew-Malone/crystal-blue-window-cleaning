@@ -401,6 +401,7 @@ function QuoteForm() {
   const [stepHeight, setStepHeight] = useState<number>();
   const [flashFields, setFlashFields] = useState<string[]>([]);
   const [cardEntered, setCardEntered] = useState(false);
+  const [submitState, setSubmitState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const stepContentRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
     windowCount: "",
@@ -442,11 +443,11 @@ function QuoteForm() {
     form.streetAddress.trim() !== "" &&
     form.desiredDate !== "";
 
-  const estimateRange = useMemo(() => {
+  const estimate = useMemo(() => {
     const windows = Number(form.windowCount);
 
     if (!windows || !form.serviceType) {
-      return "Residential visits start at $190.";
+      return { low: null, high: null, note: "Residential visits start at $190." };
     }
 
     const rate = form.serviceType === "insideOutside" ? 15 : 10;
@@ -455,11 +456,40 @@ function QuoteForm() {
     const low = Math.max(190, Math.round(base * 0.9));
     const high = Math.max(low + 35, Math.round(base * 1.25));
 
-    return `Estimated range: $${low}-$${high}. Final price depends on access, screens, buildup, and window type.`;
+    return {
+      low,
+      high,
+      note: `Estimated range: $${low}-$${high}. Final price depends on access, screens, buildup, and window type.`,
+    };
   }, [form.serviceType, form.stories, form.windowCount]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const endpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT as string | undefined;
+    if (!endpoint) {
+      console.error("VITE_FORMSPREE_ENDPOINT is not configured");
+      setSubmitState("error");
+      return;
+    }
+
+    setSubmitState("sending");
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          estimatedLow: estimate.low,
+          estimatedHigh: estimate.high,
+        }),
+      });
+
+      setSubmitState(response.ok ? "sent" : "error");
+    } catch {
+      setSubmitState("error");
+    }
   };
 
   const handleCardAnimationEnd = (event: AnimationEvent<HTMLFormElement>) => {
@@ -476,7 +506,7 @@ function QuoteForm() {
     }
 
     setStepHeight(content.scrollHeight);
-  }, [estimateRange, step]);
+  }, [estimate, step, submitState]);
 
   return (
     <form
@@ -486,7 +516,7 @@ function QuoteForm() {
       onSubmit={handleSubmit}
     >
       <div className="form-heading">
-        <h2>Request a quote</h2>
+        <h2>Request a visit</h2>
         <div className="step-track" aria-label={`Step ${step} of 2`}>
           <span className={step >= 1 ? "is-active" : ""} />
           <span className={step >= 2 ? "is-active" : ""} />
@@ -545,7 +575,7 @@ function QuoteForm() {
               </div>
               <div className="estimate-note">
                 <span className="estimate-icon" aria-hidden="true">$</span>
-                <p>{estimateRange}</p>
+                <p>{estimate.note}</p>
               </div>
               <button type="button" onClick={handleContinue}>
                 Continue
@@ -553,6 +583,10 @@ function QuoteForm() {
             </>
           ) : (
             <>
+              <div className="estimate-note">
+                <span className="estimate-icon" aria-hidden="true">$</span>
+                <p>{estimate.note}</p>
+              </div>
               <div className="field-grid">
                 <label>
                   <span>First name</span>
@@ -626,14 +660,32 @@ function QuoteForm() {
                   onChange={(event) => updateField("details", event.target.value)}
                 />
               </label>
-              <div className="button-row">
-                <button type="button" className="secondary-button" onClick={() => setStep(1)}>
-                  Back
-                </button>
-                <button type="submit" disabled={!contactComplete}>
-                  Request a Quote
-                </button>
-              </div>
+              {submitState === "sent" ? (
+                <p className="form-status">
+                  Thanks! We received your request and will reach out shortly to confirm.
+                </p>
+              ) : (
+                <>
+                  <div className="button-row">
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => setStep(1)}
+                      disabled={submitState === "sending"}
+                    >
+                      Back
+                    </button>
+                    <button type="submit" disabled={!contactComplete || submitState === "sending"}>
+                      {submitState === "sending" ? "Sending..." : "Request a Visit"}
+                    </button>
+                  </div>
+                  {submitState === "error" ? (
+                    <p className="form-status form-status--error">
+                      Something went wrong sending your request. Please call or text us instead.
+                    </p>
+                  ) : null}
+                </>
+              )}
             </>
           )}
         </div>
