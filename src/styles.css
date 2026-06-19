@@ -75,7 +75,7 @@ textarea {
   position: absolute;
   top: clamp(20px, 4vh, 34px);
   left: clamp(18px, 5vw, 76px);
-  z-index: 4;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 11px;
@@ -84,8 +84,8 @@ textarea {
 }
 
 .brand-mark {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   display: block;
   filter: drop-shadow(0 6px 18px rgba(1, 30, 45, 0.24));
 }
@@ -102,7 +102,7 @@ textarea {
   position: relative;
   z-index: 2;
   width: min(620px, calc(100% - 560px));
-  margin-top: clamp(128px, 24vh, 248px);
+  margin-top: clamp(104px, 17vh, 188px);
   color: white;
   text-shadow: 0 2px 22px rgba(1, 30, 45, 0.42);
 }
@@ -111,7 +111,7 @@ textarea {
   position: absolute;
   top: clamp(20px, 4vh, 34px);
   right: clamp(18px, 5vw, 76px);
-  z-index: 4;
+  z-index: 2;
   display: flex;
   align-items: center;
   min-height: 38px;
@@ -136,17 +136,14 @@ textarea {
 .hero-copy h1 {
   max-width: 13ch;
   margin: 0;
-  font-family: var(--display);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   font-optical-sizing: auto;
   font-size: clamp(3.2rem, 8vw, 7.4rem);
-  font-weight: 360;
-  letter-spacing: -0.005em;
-  line-height: 0.94;
-}
-
-.hero-copy h1 em {
-  font-style: italic;
-  font-weight: 400;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 0.95;
 }
 
 .lede {

@@ -563,7 +563,7 @@ function Hero() {
 
       <div className="hero-copy">
         <h1>
-          Let the <em>light</em>
+          Let the light
           <br />
           back in.
         </h1>
