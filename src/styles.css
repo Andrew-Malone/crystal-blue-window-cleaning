@@ -168,7 +168,7 @@ textarea {
   mask-image: linear-gradient(315deg, #000 0 calc(var(--dust-wipe) - 12%), rgba(0, 0, 0, 0.62) calc(var(--dust-wipe) - 4%), transparent calc(var(--dust-wipe) + 7%) 100%);
   transform: translateZ(0);
   will-change: mask-image, opacity;
-  animation: dustWipe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.25s forwards;
+  animation: dustWipe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.15s forwards;
 }
 
 .dirty-glass {
@@ -181,7 +181,7 @@ textarea {
   mask-image: linear-gradient(315deg, #000 0 calc(var(--dust-wipe) - 12%), rgba(0, 0, 0, 0.62) calc(var(--dust-wipe) - 4%), transparent calc(var(--dust-wipe) + 7%) 100%);
   transform: translateZ(0);
   will-change: mask-image, opacity;
-  animation: dustWipe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.25s forwards;
+  animation: dustWipe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.15s forwards;
 }
 
 .dirty-glass::before {
@@ -212,7 +212,7 @@ textarea {
   opacity: 0;
   transform: translateZ(0);
   will-change: background, opacity;
-  animation: cleanStripe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.25s forwards;
+  animation: cleanStripe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.15s forwards;
 }
 
 .quote-shell {
@@ -223,7 +223,7 @@ textarea {
   width: min(440px, calc(100% - 36px));
   opacity: 0;
   transform: translateY(38px);
-  animation: quoteEnter 0.74s ease 2.72s forwards;
+  animation: quoteEnter 0.74s ease 2.35s forwards;
 }
 
 .quote-card {
