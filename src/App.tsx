@@ -262,10 +262,12 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
       const rect = canvas.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
-      // The grime layer is procedural noise (smudges, water spots), so the
-      // jump from 1.5x to 2x is imperceptible on it while costing ~44% more
-      // pixel work per frame. Cap at 1.5 for this decorative overlay.
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      // The grime layer is procedural noise (smudges, water spots), so high-DPR
+      // backing stores are mostly wasted work. Mobile Safari is especially
+      // sensitive to this full-hero canvas, so cap coarse-pointer devices lower.
+      const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+      const dprCap = isCoarsePointer ? 1 : 1.5;
+      const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
       canvasWidth = w;
       canvasHeight = h;
       canvas.width = Math.round(w * dpr);
