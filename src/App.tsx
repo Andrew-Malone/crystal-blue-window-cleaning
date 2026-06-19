@@ -742,7 +742,7 @@ function About() {
         <p className="about-lede">
           Crystal Blue is a small, owner-operated window cleaning service
           based in the Pensacola area. We show up when we say we will and
-          clean every window inside and out, not just the easy half.
+          leave your glass spotless.
         </p>
 
         <div className="about-grid">
