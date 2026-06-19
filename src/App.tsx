@@ -12,6 +12,7 @@ import vistaUrl from "./assets/gulf-coast-vista-beach.png";
 function QuoteForm() {
   const [step, setStep] = useState(1);
   const [stepHeight, setStepHeight] = useState<number>();
+  const [flashFields, setFlashFields] = useState<string[]>([]);
   const stepContentRef = useRef<HTMLDivElement>(null);
   const [form, setForm] = useState({
     windowCount: "",
@@ -30,9 +31,20 @@ function QuoteForm() {
     setForm((current) => ({ ...current, [name]: value }));
   };
 
-  const qualificationComplete =
-    form.stories !== "" &&
-    form.serviceType !== "";
+  const handleContinue = () => {
+    const missing: string[] = [];
+    if (!form.windowCount) missing.push("windowCount");
+    if (!form.stories) missing.push("stories");
+    if (!form.serviceType) missing.push("serviceType");
+
+    if (missing.length > 0) {
+      setFlashFields(missing);
+      window.setTimeout(() => setFlashFields([]), 650);
+      return;
+    }
+
+    setStep(2);
+  };
 
   const contactComplete =
     form.firstName.trim() !== "" &&
@@ -76,7 +88,10 @@ function QuoteForm() {
     <form className="quote-card" aria-label="Request a window cleaning quote" onSubmit={handleSubmit}>
       <div className="form-heading">
         <h2>Request a quote</h2>
-        <span>Step {step} of 2</span>
+        <div className="step-track" aria-label={`Step ${step} of 2`}>
+          <span className={step >= 1 ? "is-active" : ""} />
+          <span className={step >= 2 ? "is-active" : ""} />
+        </div>
       </div>
 
       <div className="step-frame" style={{ height: stepHeight }}>
@@ -84,19 +99,19 @@ function QuoteForm() {
           {step === 1 ? (
             <>
               <div className="field-grid">
-                <label>
+                <label className={flashFields.includes("windowCount") ? "is-flash" : undefined}>
                   <span>Approximate window count</span>
                   <input
                     name="windowCount"
-                  type="number"
-                  inputMode="numeric"
-                  min="1"
-                  placeholder="20"
-                  value={form.windowCount}
-                  onChange={(event) => updateField("windowCount", event.target.value)}
-                />
+                    type="number"
+                    inputMode="numeric"
+                    min="1"
+                    placeholder="20"
+                    value={form.windowCount}
+                    onChange={(event) => updateField("windowCount", event.target.value)}
+                  />
                 </label>
-                <label>
+                <label className={flashFields.includes("stories") ? "is-flash" : undefined}>
                   <span>Stories</span>
                   <select
                     name="stories"
@@ -109,7 +124,7 @@ function QuoteForm() {
                   </select>
                 </label>
               </div>
-              <div className="service-field">
+              <div className={`service-field${flashFields.includes("serviceType") ? " is-flash" : ""}`}>
                 <span>Service type</span>
                 <div className="segmented-control" role="group" aria-label="Service type">
                   <button
@@ -130,12 +145,11 @@ function QuoteForm() {
                   </button>
                 </div>
               </div>
-              <p className="range-note">{estimateRange}</p>
-              <button
-                type="button"
-                disabled={!qualificationComplete}
-                onClick={() => setStep(2)}
-              >
+              <div className="estimate-note">
+                <span className="estimate-icon" aria-hidden="true">$</span>
+                <p>{estimateRange}</p>
+              </div>
+              <button type="button" onClick={handleContinue}>
                 Continue
               </button>
             </>

@@ -286,17 +286,26 @@ textarea {
 
 .form-heading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 18px;
 }
 
-.form-heading span {
-  color: #4f7a8b;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
+.step-track {
+  display: flex;
+  gap: 6px;
+}
+
+.step-track span {
+  width: 22px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(8, 74, 103, 0.18);
+  transition: background 200ms ease;
+}
+
+.step-track span.is-active {
+  background: var(--blue);
 }
 
 .step-frame {
@@ -310,16 +319,62 @@ textarea {
   animation: stepContentEnter 220ms ease both;
 }
 
-.range-note {
+.estimate-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(8, 126, 164, 0.1);
+  border: 1px solid rgba(8, 126, 164, 0.18);
+}
+
+.estimate-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--blue);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.estimate-note p {
   margin: 0;
   color: #164a60;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 800;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .step-content > button {
   margin-top: 6px;
+}
+
+.is-flash input,
+.is-flash select,
+.is-flash .segmented-control button {
+  animation: fieldFlash 600ms ease;
+}
+
+.is-flash span:first-child {
+  color: #b3261e;
+}
+
+@keyframes fieldFlash {
+  0%,
+  100% {
+    border-color: rgba(8, 74, 103, 0.2);
+    box-shadow: none;
+  }
+  25%,
+  75% {
+    border-color: #d33a30;
+    box-shadow: 0 0 0 3px rgba(211, 58, 48, 0.22);
+  }
 }
 
 .field-grid {
