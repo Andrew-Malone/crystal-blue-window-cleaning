@@ -7,7 +7,7 @@ import {
   type FormEvent,
 } from "react";
 import logoMarkUrl from "./assets/crystal-blue-mark.svg";
-import vistaUrl from "./assets/gulf-coast-vista-beach.png";
+import vistaUrl from "./assets/gulf-coast-vista.png";
 
 type Pt = { x: number; y: number };
 
@@ -115,8 +115,6 @@ function drawGrime(ctx: CanvasRenderingContext2D, w: number, h: number) {
 // churn (which is what was causing the wipe to stutter).
 function makeSqueegeePainter(
   ctx: CanvasRenderingContext2D,
-  w: number,
-  h: number,
   dir: Pt,
   span: number,
 ) {
@@ -162,15 +160,14 @@ function makeSqueegeePainter(
     ctx.stroke();
   };
 
-  // Anchor the assembly at the foot of the perpendicular from the window centre
-  // onto the channel line (x + y = channelT). This keeps the handle in the
-  // middle of the window and, being linear in channelT, slides smoothly — the
-  // old anchor was the foot from the (0,0) corner, which biased it top-left.
-  const cMid = (w + h) / 2;
+  // Anchor on the x === y diagonal (the foot of the perpendicular from the
+  // (0,0) corner onto the channel line x + y = channelT). The handle rides a
+  // little toward the top-left, but it emerges smoothly from the corner the
+  // wipe starts in — centring it on the window instead detaches it from that
+  // reveal and makes it pop in mid-sweep.
   return (channelT: number) => {
-    const d = (channelT - cMid) / 2;
-    const cx = w / 2 + d;
-    const cy = h / 2 + d;
+    const cx = channelT / 2;
+    const cy = channelT / 2;
 
     ctx.save();
     ctx.translate(cx, cy);
@@ -189,24 +186,25 @@ function makeSqueegeePainter(
     blade(0, cw, metal);
     blade(bladeX, 6, "#16242b");
 
-    // T-handle: offset shadow first, then neck, grip and grip highlight
-    ctx.fillStyle = "rgba(2, 24, 36, 0.16)";
-    roundRect(ctx, -neckLen + 4, -neckW / 2 + 4, neckLen, neckW, 5);
-    ctx.fill();
-    roundRect(ctx, gx + 4, -gripLen / 2 + 4, gripThick, gripLen, 11);
-    ctx.fill();
+    // T-handle: hidden for now (it rides slightly off-centre on a non-square
+    // window). Uncomment to restore it; `neck`/`grip` gradients above feed it.
+    // ctx.fillStyle = "rgba(2, 24, 36, 0.16)";
+    // roundRect(ctx, -neckLen + 4, -neckW / 2 + 4, neckLen, neckW, 5);
+    // ctx.fill();
+    // roundRect(ctx, gx + 4, -gripLen / 2 + 4, gripThick, gripLen, 11);
+    // ctx.fill();
 
-    roundRect(ctx, -neckLen, -neckW / 2, neckLen, neckW, 5);
-    ctx.fillStyle = neck;
-    ctx.fill();
+    // roundRect(ctx, -neckLen, -neckW / 2, neckLen, neckW, 5);
+    // ctx.fillStyle = neck;
+    // ctx.fill();
 
-    roundRect(ctx, gx, -gripLen / 2, gripThick, gripLen, 11);
-    ctx.fillStyle = grip;
-    ctx.fill();
+    // roundRect(ctx, gx, -gripLen / 2, gripThick, gripLen, 11);
+    // ctx.fillStyle = grip;
+    // ctx.fill();
 
-    roundRect(ctx, gx + 4, -gripLen / 2 + 6, 4, gripLen - 12, 2);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
-    ctx.fill();
+    // roundRect(ctx, gx + 4, -gripLen / 2 + 6, 4, gripLen - 12, 2);
+    // ctx.fillStyle = "rgba(255, 255, 255, 0.18)";
+    // ctx.fill();
 
     ctx.restore();
   };
@@ -263,7 +261,7 @@ function WindowWipe() {
     const span = Math.hypot(w, h);
     const dir: Pt = { x: Math.SQRT1_2, y: Math.SQRT1_2 };
     const ease = cubicBezier(0.72, 0, 0.2, 1);
-    const paintSqueegee = makeSqueegeePainter(ctx, w, h, dir, span);
+    const paintSqueegee = makeSqueegeePainter(ctx, dir, span);
 
     let raf = 0;
     let startTime = 0;
@@ -520,7 +518,7 @@ function QuoteForm() {
                 />
               </label>
               <label>
-                <span>Anything else we should know?</span>
+                <span>Anything else we should know? (optional)</span>
                 <textarea
                   name="details"
                   rows={3}
@@ -548,19 +546,28 @@ function QuoteForm() {
 function Hero() {
   return (
     <header className="hero" style={{ "--vista": `url(${vistaUrl})` } as CSSProperties}>
-      <div className="hero-copy">
-        <h2>
-          <span>Let the light</span>
-          <span>back in.</span>
-        </h2>
+      <div className="masthead">
+        <img className="brand-mark" src={logoMarkUrl} alt="" aria-hidden="true" />
+        <span className="brand-name">Crystal Blue Window Cleaning</span>
       </div>
 
-      <div className="brand-lockup">
-        <div className="brand-line">
-          <img className="brand-mark" src={logoMarkUrl} alt="" aria-hidden="true" />
-          <h1>Crystal Blue Window Cleaning</h1>
-        </div>
-        <p>
+      <p className="locale">
+        <svg className="locale-pin" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"
+          />
+        </svg>
+        Serving the greater Pensacola area
+      </p>
+
+      <div className="hero-copy">
+        <h1>
+          Let the <em>light</em>
+          <br />
+          back in.
+        </h1>
+        <p className="lede">
           Simple, streak-free window cleaning for brighter homes and clearer
           views.
         </p>
