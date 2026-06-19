@@ -15,12 +15,6 @@
   --display: "Fraunces", Inter, serif;
 }
 
-@property --dust-wipe {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 118%;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -141,106 +135,18 @@ textarea {
   line-height: 1.55;
 }
 
-.window-scene,
-.glass-haze,
-.dirty-glass,
-.clean-swipe {
+.window-scene {
   position: absolute;
   inset: 0;
+  z-index: 3;
+  display: block;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
-.window-scene {
-  z-index: 3;
-  overflow: hidden;
-  contain: paint;
-}
-
-.glass-haze {
-  background:
-    radial-gradient(ellipse at 11% 18%, rgba(68, 74, 75, 0.16) 0 10px, transparent 42px),
-    radial-gradient(ellipse at 29% 71%, rgba(255, 255, 255, 0.18) 0 5px, transparent 24px),
-    radial-gradient(ellipse at 48% 33%, rgba(51, 58, 60, 0.11) 0 7px, transparent 36px),
-    radial-gradient(ellipse at 73% 17%, rgba(255, 255, 255, 0.16) 0 6px, transparent 31px),
-    radial-gradient(ellipse at 86% 76%, rgba(41, 51, 54, 0.13) 0 14px, transparent 54px),
-    radial-gradient(circle at 64% 84%, rgba(255, 255, 255, 0.14) 0 3px, transparent 17px),
-    linear-gradient(180deg, rgba(224, 227, 226, 0.5), rgba(165, 174, 176, 0.42));
-  background-size: 100% 100%;
-  opacity: 0.92;
-  mask-image: linear-gradient(315deg, #000 0 calc(var(--dust-wipe) - 12%), rgba(0, 0, 0, 0.62) calc(var(--dust-wipe) - 4%), transparent calc(var(--dust-wipe) + 7%) 100%);
-  transform: translateZ(0);
-  will-change: mask-image, opacity;
-  animation: dustWipe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.15s forwards;
-}
-
-.dirty-glass {
-  background:
-    radial-gradient(ellipse at 20% 28%, rgba(243, 246, 245, 0.26), transparent 28%),
-    radial-gradient(ellipse at 58% 54%, rgba(69, 80, 84, 0.18), transparent 34%),
-    radial-gradient(ellipse at 84% 34%, rgba(255, 255, 255, 0.16), transparent 22%),
-    linear-gradient(180deg, rgba(226, 229, 228, 0.58), rgba(137, 149, 153, 0.48));
-  opacity: 0.9;
-  mask-image: linear-gradient(315deg, #000 0 calc(var(--dust-wipe) - 12%), rgba(0, 0, 0, 0.62) calc(var(--dust-wipe) - 4%), transparent calc(var(--dust-wipe) + 7%) 100%);
-  transform: translateZ(0);
-  will-change: mask-image, opacity;
-  animation: dustWipe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.15s forwards;
-}
-
-.dirty-glass::before {
-  position: absolute;
-  inset: -8%;
-  content: "";
-  background:
-    radial-gradient(circle at 7% 49%, rgba(255, 255, 255, 0.22) 0 2px, transparent 6px),
-    radial-gradient(circle at 9% 18%, rgba(38, 47, 50, 0.13) 0 2px, transparent 8px),
-    radial-gradient(circle at 13% 67%, rgba(255, 255, 255, 0.17) 0 1px, transparent 5px),
-    radial-gradient(circle at 18% 81%, rgba(34, 44, 47, 0.16) 0 3px, transparent 9px),
-    radial-gradient(circle at 23% 38%, rgba(42, 50, 53, 0.14) 0 3px, transparent 10px),
-    radial-gradient(circle at 27% 57%, rgba(255, 255, 255, 0.15) 0 2px, transparent 7px),
-    radial-gradient(circle at 31% 22%, rgba(255, 255, 255, 0.2) 0 1px, transparent 5px),
-    radial-gradient(circle at 38% 87%, rgba(255, 255, 255, 0.16) 0 2px, transparent 7px),
-    radial-gradient(circle at 41% 12%, rgba(255, 255, 255, 0.13) 0 2px, transparent 8px),
-    radial-gradient(circle at 46% 63%, rgba(38, 47, 50, 0.17) 0 2px, transparent 7px),
-    radial-gradient(circle at 54% 17%, rgba(40, 49, 52, 0.13) 0 2px, transparent 8px),
-    radial-gradient(circle at 58% 73%, rgba(35, 44, 47, 0.15) 0 3px, transparent 10px),
-    radial-gradient(circle at 62% 29%, rgba(255, 255, 255, 0.16) 0 1px, transparent 6px),
-    radial-gradient(circle at 67% 38%, rgba(255, 255, 255, 0.18) 0 3px, transparent 10px),
-    radial-gradient(circle at 72% 58%, rgba(255, 255, 255, 0.14) 0 1px, transparent 6px),
-    radial-gradient(circle at 76% 12%, rgba(39, 48, 51, 0.13) 0 2px, transparent 8px),
-    radial-gradient(circle at 79% 86%, rgba(36, 45, 48, 0.14) 0 2px, transparent 8px),
-    radial-gradient(circle at 84% 43%, rgba(36, 45, 48, 0.12) 0 3px, transparent 11px),
-    radial-gradient(circle at 87% 64%, rgba(255, 255, 255, 0.14) 0 2px, transparent 7px),
-    radial-gradient(circle at 91% 16%, rgba(255, 255, 255, 0.2) 0 1px, transparent 6px),
-    radial-gradient(circle at 94% 72%, rgba(255, 255, 255, 0.15) 0 2px, transparent 9px),
-    radial-gradient(circle at 96% 32%, rgba(41, 50, 53, 0.13) 0 2px, transparent 8px),
-    radial-gradient(ellipse at 56% 44%, rgba(44, 53, 56, 0.12) 0 8px, transparent 30px);
-  background-size: 100% 100%;
-  opacity: 0.95;
-}
-
-.dirty-glass::after {
-  position: absolute;
-  inset: -4%;
-  content: "";
-  background:
-    radial-gradient(circle at 5% 76%, rgba(255, 255, 255, 0.12) 0 1px, transparent 5px),
-    radial-gradient(circle at 16% 29%, rgba(43, 52, 55, 0.11) 0 2px, transparent 7px),
-    radial-gradient(circle at 24% 91%, rgba(255, 255, 255, 0.14) 0 2px, transparent 8px),
-    radial-gradient(circle at 36% 47%, rgba(36, 45, 48, 0.12) 0 1px, transparent 6px),
-    radial-gradient(circle at 49% 79%, rgba(255, 255, 255, 0.13) 0 2px, transparent 7px),
-    radial-gradient(circle at 69% 21%, rgba(35, 44, 47, 0.11) 0 2px, transparent 8px),
-    radial-gradient(circle at 82% 7%, rgba(255, 255, 255, 0.12) 0 1px, transparent 5px),
-    radial-gradient(circle at 93% 92%, rgba(37, 46, 49, 0.1) 0 2px, transparent 8px);
-  opacity: 0.9;
-}
-
-.clean-swipe {
-  background:
-    linear-gradient(315deg, transparent 0 calc(var(--dust-wipe) - 7%), rgba(255, 255, 255, 0.72) calc(var(--dust-wipe) - 1%), rgba(255, 255, 255, 0.38) calc(var(--dust-wipe) + 4%), transparent calc(var(--dust-wipe) + 10%) 100%);
-  opacity: 0;
-  transform: translateZ(0);
-  will-change: background, opacity;
-  animation: cleanStripe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.15s forwards;
+.window-scene.is-clean {
+  display: none;
 }
 
 /* No transform / opacity / will-change here: a transformed or opacity-animated
@@ -336,8 +242,8 @@ textarea {
   gap: 10px;
   padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(8, 126, 164, 0.1);
-  border: 1px solid rgba(8, 126, 164, 0.18);
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(8, 74, 103, 0.2);
 }
 
 .estimate-icon {
@@ -523,35 +429,6 @@ button:disabled {
   }
 }
 
-@keyframes dustWipe {
-  0% {
-    --dust-wipe: 118%;
-    opacity: 0.92;
-  }
-  72% {
-    opacity: 0.9;
-  }
-  100% {
-    --dust-wipe: -18%;
-    opacity: 0.86;
-  }
-}
-
-@keyframes cleanStripe {
-  0% {
-    --dust-wipe: 118%;
-    opacity: 0;
-  }
-  16%,
-  76% {
-    opacity: 0.72;
-  }
-  100% {
-    --dust-wipe: -18%;
-    opacity: 0;
-  }
-}
-
 @keyframes quoteEnter {
   from {
     opacity: 0;
@@ -642,12 +519,6 @@ button:disabled {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-  }
-
-  .dirty-glass,
-  .glass-haze,
-  .clean-swipe {
-    opacity: 0;
   }
 
   .quote-card {
