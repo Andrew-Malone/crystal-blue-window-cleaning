@@ -243,28 +243,39 @@ textarea {
   animation: cleanStripe 2.65s cubic-bezier(0.72, 0, 0.2, 1) 0.15s forwards;
 }
 
+/* No transform / opacity / will-change here: a transformed or opacity-animated
+   ancestor would become the card's "backdrop root" and break its
+   backdrop-filter in Chrome. Centering is done with flex instead. */
 .quote-shell {
   position: absolute;
   right: clamp(18px, 5vw, 76px);
-  top: 50%;
+  top: 0;
+  bottom: 0;
   z-index: 5;
   width: min(500px, calc(100% - 36px));
-  opacity: 0;
-  transform: translateY(calc(-50% + 38px));
-  animation: quoteEnter 0.74s ease 2.35s forwards;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
 }
 
 .quote-card {
   position: relative;
   display: grid;
   gap: 24px;
+  width: 100%;
   padding: clamp(22px, 3.4vw, 32px);
   border-radius: 10px;
+  pointer-events: auto;
   background:
     linear-gradient(128deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.06) 26%, transparent 46%),
     linear-gradient(155deg, rgba(238, 253, 255, 0.66), rgba(193, 232, 244, 0.46));
   backdrop-filter: blur(22px) saturate(150%);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
+  /* Entrance lives on the card itself (its own transform doesn't disable its
+     backdrop-filter) and eases the blur in so the frost doesn't snap on. */
+  opacity: 0;
+  transform: translateY(38px);
+  animation: quoteEnter 0.85s ease 2.35s both;
   box-shadow:
     0 24px 80px rgba(1, 30, 45, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
@@ -542,9 +553,17 @@ button:disabled {
 }
 
 @keyframes quoteEnter {
+  from {
+    opacity: 0;
+    transform: translateY(38px);
+    backdrop-filter: blur(0) saturate(120%);
+    -webkit-backdrop-filter: blur(0) saturate(120%);
+  }
   to {
     opacity: 1;
-    transform: translateY(-50%);
+    transform: translateY(0);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
   }
 }
 
@@ -631,8 +650,8 @@ button:disabled {
     opacity: 0;
   }
 
-  .quote-shell {
+  .quote-card {
     opacity: 1;
-    transform: translateY(-50%);
+    transform: none;
   }
 }
