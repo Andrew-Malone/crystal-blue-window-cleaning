@@ -42,9 +42,13 @@ textarea {
 .hero {
   position: relative;
   isolation: isolate;
+  z-index: 1;
   min-height: 100svh;
   padding: 24px clamp(18px, 4vw, 56px) 48px;
-  overflow: hidden;
+  /* body already clips horizontal overflow; .hero must allow vertical
+     overflow (not just "auto") so the quote card can overlap .about
+     below it without a clipping/scroll boundary appearing mid-card. */
+  overflow: visible;
   background:
     linear-gradient(90deg, rgba(3, 38, 56, 0.52), rgba(5, 67, 94, 0.1) 46%, rgba(236, 251, 255, 0.12)),
     var(--vista) center / cover no-repeat,
@@ -165,12 +169,9 @@ textarea {
 .quote-shell {
   position: absolute;
   right: clamp(18px, 5vw, 76px);
-  top: 0;
-  bottom: 0;
+  top: clamp(88px, 11vh, 124px);
   z-index: 5;
   width: min(500px, calc(100% - 36px));
-  display: flex;
-  align-items: center;
   pointer-events: none;
 }
 
@@ -374,6 +375,9 @@ input,
 select,
 textarea {
   width: 100%;
+  /* Override the inherited label font-size (0.82rem): anything under 16px
+     makes mobile Safari/Chrome zoom the page in on focus. */
+  font-size: 16px;
   border: 1px solid rgba(8, 74, 103, 0.2);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.86);

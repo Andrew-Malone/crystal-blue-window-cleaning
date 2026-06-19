@@ -504,8 +504,17 @@ function QuoteForm() {
       return;
     }
 
-    setStepHeight(content.scrollHeight);
-  }, [estimate, step, submitState]);
+    // A one-shot scrollHeight read goes stale if a web font swap or other
+    // async reflow resizes the content after this runs (more likely on a
+    // slow mobile connection), leaving the frame clipped below its real
+    // height. Keep tracking it for as long as this step is mounted.
+    const observer = new ResizeObserver(([entry]) => {
+      setStepHeight(entry.target.scrollHeight);
+    });
+    observer.observe(content);
+
+    return () => observer.disconnect();
+  }, [step]);
 
   return (
     <form
