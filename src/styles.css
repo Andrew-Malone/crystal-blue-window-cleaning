@@ -77,14 +77,10 @@ textarea {
 }
 
 .brand-mark {
-  display: grid;
   width: 46px;
   height: 46px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.76);
-  border-radius: 8px;
-  background: rgba(236, 251, 255, 0.32);
-  box-shadow: inset 0 1px 18px rgba(255, 255, 255, 0.16);
+  display: block;
+  filter: drop-shadow(0 6px 18px rgba(1, 30, 45, 0.24));
 }
 
 .hero-copy {

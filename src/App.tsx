@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import logoMarkUrl from "./assets/crystal-blue-mark.svg";
 import vistaUrl from "./assets/gulf-coast-vista.png";
 
 function QuoteForm() {
@@ -58,7 +59,7 @@ function Hero() {
 
       <div className="brand-lockup">
         <div className="brand-line">
-          <span className="brand-mark" aria-hidden="true">CB</span>
+          <img className="brand-mark" src={logoMarkUrl} alt="" aria-hidden="true" />
           <h1>Crystal Blue Window Cleaning</h1>
         </div>
         <p>

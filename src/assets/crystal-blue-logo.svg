@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 82" role="img" aria-labelledby="title">
+  <title id="title">Crystal Blue Window Cleaning logo</title>
+  <defs>
+    <linearGradient id="glass" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e9fbff"/>
+      <stop offset="0.48" stop-color="#7ed9ef"/>
+      <stop offset="1" stop-color="#087ea4"/>
+    </linearGradient>
+    <linearGradient id="wipe" x1="14" y1="50" x2="50" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.38"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <rect x="6" y="9" width="64" height="64" rx="13" fill="#05364d"/>
+    <rect x="11" y="14" width="54" height="54" rx="9" fill="url(#glass)"/>
+    <path d="M16 62 60 18h5v13L31 68H16z" fill="url(#wipe)"/>
+    <path d="M38 15v52M12 41h52" stroke="#f3fdff" stroke-width="2.8" stroke-linecap="round" opacity="0.72"/>
+    <rect x="11" y="14" width="54" height="54" rx="9" fill="none" stroke="#f6fdff" stroke-width="2.5"/>
+  </g>
+  <text x="90" y="39" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="0">
+    Crystal Blue
+  </text>
+  <text x="90" y="63" fill="#d8fbff" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="800" letter-spacing="2.1">
+    WINDOW CLEANING
+  </text>
+</svg>
