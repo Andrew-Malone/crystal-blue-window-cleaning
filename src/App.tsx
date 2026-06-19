@@ -4,7 +4,6 @@ import vistaUrl from "./assets/gulf-coast-vista.png";
 function QuoteForm() {
   return (
     <form className="quote-card" aria-label="Request a window cleaning quote">
-      <p className="eyebrow">Free estimate</p>
       <h2>Request a quote</h2>
       <div className="field-grid">
         <label>
@@ -61,11 +60,10 @@ function Hero() {
       </nav>
 
       <div className="hero-copy">
-        <p className="eyebrow">Gulf Coast window cleaning</p>
-        <h1>Clear views, coastal shine.</h1>
+        <h1>Let the light back in.</h1>
         <p>
-          Residential and commercial window cleaning for homes, storefronts, and
-          beach properties that need the salt, haze, and streaks gone.
+          Simple, streak-free window cleaning for brighter homes and clearer
+          views.
         </p>
       </div>
 
