@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -441,8 +442,13 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
   );
 }
 
-function QuoteForm() {
+function QuoteForm({ onStepChange }: { onStepChange?: (step: number) => void }) {
   const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    onStepChange?.(step);
+  }, [step, onStepChange]);
+
   const [stepHeight, setStepHeight] = useState<number>();
   const [flashFields, setFlashFields] = useState<string[]>([]);
   const [cardEntered, setCardEntered] = useState(false);
@@ -748,6 +754,8 @@ function QuoteForm() {
 }
 
 function Hero() {
+  const [quoteStep, setQuoteStep] = useState(1);
+
   return (
     <header className="hero" style={{ "--vista": `url(${vistaUrl})` } as CSSProperties}>
       <div className="masthead">
@@ -775,8 +783,8 @@ function Hero() {
 
       <WindowWipe revealImageUrl={vistaUrl} />
 
-      <div id="quote" className="quote-shell">
-        <QuoteForm />
+      <div id="quote" className={`quote-shell is-step-${quoteStep}`}>
+        <QuoteForm onStepChange={setQuoteStep} />
       </div>
     </header>
   );

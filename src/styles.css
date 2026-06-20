@@ -171,13 +171,25 @@ textarea {
 /* No transform / opacity / will-change here: a transformed or opacity-animated
    ancestor would become the card's "backdrop root" and break its
    backdrop-filter in Chrome. Centering is done with flex instead. */
+/* Each step gets its own top anchor (set in the .is-step-* rules) so the
+   shorter step 1 can sit lower on the page while the taller step 2 starts
+   higher without running under the masthead. No transform here — a
+   transformed ancestor would break the card's backdrop-filter in Chrome. */
 .quote-shell {
   position: absolute;
   right: clamp(18px, 5vw, 76px);
-  top: clamp(88px, 11vh, 124px);
   z-index: 5;
   width: min(500px, calc(100% - 36px));
   pointer-events: none;
+  transition: top 0.45s ease;
+}
+
+.quote-shell.is-step-1 {
+  top: clamp(140px, 21vh, 260px);
+}
+
+.quote-shell.is-step-2 {
+  top: clamp(80px, 10vh, 124px);
 }
 
 .quote-card {
