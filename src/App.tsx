@@ -728,18 +728,78 @@ function QuoteForm() {
   );
 }
 
-function SiteNav({ onQuote }: { onQuote: () => void }) {
+// Minimal history-API router. The site is three pages, so this is cheaper than
+// pulling in a routing library; Cloudflare already serves the SPA fallback for
+// deep links (see wrangler.jsonc `not_found_handling`).
+function usePath() {
+  const [path, setPath] = useState(() => window.location.pathname);
+
+  useEffect(() => {
+    const onPop = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  const navigate = (next: string) => {
+    if (next !== window.location.pathname) {
+      window.history.pushState({}, "", next);
+      setPath(next);
+    }
+    window.scrollTo(0, 0);
+  };
+
+  return { path, navigate };
+}
+
+function PageLink({
+  to,
+  navigate,
+  children,
+}: {
+  to: string;
+  navigate: (path: string) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={to}
+      onClick={(event) => {
+        // Let the browser handle modified clicks (new tab, download, etc.).
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+        event.preventDefault();
+        navigate(to);
+      }}
+    >
+      {children}
+    </a>
+  );
+}
+
+function SiteNav({ navigate }: { navigate: (path: string) => void }) {
   return (
     <nav className="site-nav" aria-label="Main">
       <div className="nav-links">
-        <a href="#about">About Us</a>
+        <PageLink to="/about" navigate={navigate}>
+          About Us
+        </PageLink>
         <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
           Reviews
         </a>
-        <a href="#contact">Contact</a>
       </div>
 
-      <a className="brand" href="#top">
+      <a
+        className="brand"
+        href="/"
+        onClick={(event) => {
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return;
+          }
+          event.preventDefault();
+          navigate("/");
+        }}
+      >
         <img className="brand-mark" src={logoMarkUrl} alt="" aria-hidden="true" />
         <span className="brand-name">
           <b>Dolphin Bay</b>
@@ -747,10 +807,26 @@ function SiteNav({ onQuote }: { onQuote: () => void }) {
         </span>
       </a>
 
-      <div className="nav-quote">
-        <QuoteButton onQuote={onQuote} compact />
+      <div className="nav-links nav-links--right">
+        <PageLink to="/faq" navigate={navigate}>
+          FAQ
+        </PageLink>
+        <a href="#contact">Contact</a>
       </div>
     </nav>
+  );
+}
+
+// Stub pages so the new nav destinations resolve. Replace the body copy with
+// real content when it's written.
+function PlaceholderPage({ title, blurb }: { title: string; blurb: string }) {
+  return (
+    <section className="page-head">
+      <div className="page-head-inner">
+        <h1>{title}</h1>
+        <p>{blurb}</p>
+      </div>
+    </section>
   );
 }
 
@@ -777,25 +853,13 @@ function ArrowIcon() {
   );
 }
 
-function QuoteButton({
-  onQuote,
-  compact,
-}: {
-  onQuote: () => void;
-  compact?: boolean;
-}) {
+function QuoteButton({ onQuote }: { onQuote: () => void }) {
   return (
-    <button
-      type="button"
-      className={`quote-button${compact ? " quote-button--nav" : ""}`}
-      onClick={onQuote}
-    >
+    <button type="button" className="quote-button" onClick={onQuote}>
       <span>Get Quote</span>
-      {compact ? null : (
-        <span className="quote-button-icon" aria-hidden="true">
-          <ArrowIcon />
-        </span>
-      )}
+      <span className="quote-button-icon" aria-hidden="true">
+        <ArrowIcon />
+      </span>
     </button>
   );
 }
@@ -952,12 +1016,29 @@ export default function App() {
   const [quoteOpen, setQuoteOpen] = useState(false);
   const openQuote = () => setQuoteOpen(true);
   const closeQuote = () => setQuoteOpen(false);
+  const { path, navigate } = usePath();
 
   return (
     <>
-      <SiteNav onQuote={openQuote} />
-      <Hero onQuote={openQuote} />
-      <About />
+      <SiteNav navigate={navigate} />
+
+      {path === "/about" ? (
+        <PlaceholderPage
+          title="About Us"
+          blurb="This page is a placeholder — the full About Us story is still being written."
+        />
+      ) : path === "/faq" ? (
+        <PlaceholderPage
+          title="FAQ"
+          blurb="This page is a placeholder — answers to the questions we get asked most are on the way."
+        />
+      ) : (
+        <>
+          <Hero onQuote={openQuote} />
+          <About />
+        </>
+      )}
+
       <Contact onQuote={openQuote} />
       <QuoteDialog open={quoteOpen} onClose={closeQuote} />
     </>
