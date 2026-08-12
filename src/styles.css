@@ -1,21 +1,33 @@
 :root {
-  color: #08283a;
-  /* Matches .hero's solid fallback so iOS's rubber-band bounce at the top
-     (right under the translucent address bar) doesn't flash a contrasting
-     color against the dark hero photo. */
-  background: #0a1418;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  /* Vintage navy: desaturated, grey-leaning slate rather than a saturated
+     modern navy — reads worn-in and established. */
+  --navy: #24415e;
+  --navy-mid: #3b5c7d;
+  /* Body copy sits close to full navy — the old 0.74 washed out against the
+     pale seafoam ground and was hard to read. */
+  --navy-soft: rgba(30, 54, 79, 0.94);
+  --seafoam: #dff3ea;
+  --seafoam-deep: #a8dcc9;
+  --seafoam-tint: #f1faf6;
+  --pink: #ff8494;
+  --pink-light: #ffa0ac;
+  --pink-deep: #d9536a;
+  --gold: #f0b429;
+  /* Height of the sticky nav, subtracted from the hero so the hero fills the
+     first screen exactly and the next section starts below the fold. */
+  /* Must match the rendered bar: 46px CTA + 2 x 11px padding. */
+  --nav-h: 68px;
+  --display: "Bitter", Georgia, "Times New Roman", serif;
+  /* Used only for the hero headline. */
+  --display-hero: "Playfair Display", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  color: var(--navy);
+  background: var(--seafoam-tint);
+  font-family: var(--body);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --deep: #06354c;
-  --blue: #087ea4;
-  --aqua: #54d3ee;
-  --foam: #ecfbff;
-  --glass: rgba(244, 253, 255, 0.76);
-  --display: "Fraunces", Inter, serif;
 }
 
 * {
@@ -32,6 +44,7 @@ body {
   min-width: 320px;
   overflow-x: hidden;
   overscroll-behavior-y: none;
+  background: var(--seafoam-tint);
 }
 
 a {
@@ -40,118 +53,287 @@ a {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
-.hero {
-  position: relative;
-  isolation: isolate;
-  z-index: 1;
-  min-height: 100svh;
-  padding: 24px clamp(18px, 4vw, 56px) 48px;
-  /* body already clips horizontal overflow; .hero must allow vertical
-     overflow (not just "auto") so the quote card can overlap .about
-     below it without a clipping/scroll boundary appearing mid-card. */
-  overflow: visible;
-  background:
-    linear-gradient(90deg, rgba(3, 38, 56, 0.52), rgba(5, 67, 94, 0.1) 46%, rgba(236, 251, 255, 0.12)),
-    var(--vista) center / cover no-repeat,
-    #0a1418;
+/* ---------- top nav ---------- */
+
+/* Links left, brand centred, CTA right. The centre column is `auto` so the
+   brand sits at the true centre of the bar regardless of link width. */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 11px clamp(18px, 5vw, 60px);
+  background: var(--navy);
+  color: var(--seafoam-tint);
 }
 
-.hero::before {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  content: "";
-  background: var(--vista) center / cover no-repeat;
-}
-
-.hero::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  background:
-    radial-gradient(circle at 24% 16%, rgba(255, 255, 255, 0.36), transparent 24%),
-    linear-gradient(180deg, rgba(7, 63, 84, 0.06), rgba(2, 34, 50, 0.24));
-  pointer-events: none;
-}
-
-.masthead {
-  position: absolute;
-  top: clamp(20px, 4vh, 34px);
-  left: clamp(18px, 5vw, 76px);
-  z-index: 2;
+.brand {
   display: flex;
   align-items: center;
-  gap: 11px;
-  color: white;
-  text-shadow: 0 2px 18px rgba(1, 30, 45, 0.42);
+  gap: 12px;
+  justify-self: center;
+  text-decoration: none;
+}
+
+.nav-quote {
+  justify-self: end;
 }
 
 .brand-mark {
   width: 44px;
   height: 44px;
   display: block;
-  filter: drop-shadow(0 6px 18px rgba(1, 30, 45, 0.24));
+  flex: none;
 }
 
 .brand-name {
+  display: grid;
+  gap: 2px;
+  line-height: 1;
+}
+
+.brand-name b {
   font-family: var(--display);
-  font-size: clamp(1.05rem, 1.6vw, 1.32rem);
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
+  font-size: clamp(1.12rem, 2vw, 1.38rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--seafoam-tint);
 }
 
-.hero-copy {
-  position: relative;
-  z-index: 2;
-  width: min(620px, calc(100% - 560px));
-  margin-top: clamp(104px, 17vh, 188px);
-  color: white;
-  text-shadow: 0 2px 22px rgba(1, 30, 45, 0.42);
+.brand-name span {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(223, 243, 234, 0.62);
 }
 
-.locale {
-  position: absolute;
-  top: clamp(20px, 4vh, 34px);
-  right: clamp(18px, 5vw, 76px);
-  z-index: 2;
+.nav-links {
   display: flex;
   align-items: center;
-  min-height: 38px;
-  gap: 7px;
-  margin: 0;
+  gap: clamp(16px, 2.4vw, 34px);
+}
+
+.nav-links a {
+  position: relative;
   font-family: var(--display);
-  font-size: clamp(1.05rem, 1.6vw, 1.32rem);
+  font-size: clamp(0.98rem, 1.4vw, 1.1rem);
   font-weight: 500;
-  letter-spacing: 0.01em;
-  color: white;
-  text-shadow: 0 2px 18px rgba(1, 30, 45, 0.42);
+  text-decoration: none;
+  color: var(--seafoam-tint);
+  padding: 6px 0;
 }
 
-.locale-pin {
-  flex: none;
-  width: 0.92em;
-  height: 0.92em;
-  color: var(--aqua);
-  filter: drop-shadow(0 1px 4px rgba(1, 30, 45, 0.45));
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--pink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms ease;
 }
 
-.hero-copy h1 {
-  max-width: 13ch;
+.nav-links a:hover::after,
+.nav-links a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* ---------- hero ---------- */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  align-items: center;
+  align-content: center;
+  min-height: calc(100vh - var(--nav-h));
+  gap: clamp(30px, 4.5vw, 66px);
+  padding: clamp(30px, 5vh, 60px) clamp(18px, 5vw, 60px) clamp(40px, 6vh, 76px);
+  background:
+    radial-gradient(ellipse 80% 70% at 20% 0%, rgba(168, 220, 201, 0.6), transparent 68%),
+    linear-gradient(180deg, var(--seafoam), var(--seafoam-tint));
+}
+
+/* Media sits in the hero's left column so it is visible without scrolling.
+   Single frame only — the image is the container, with just the offset shadow
+   that the CTA and form card share. */
+.hero-media {
+  position: relative;
+  z-index: 2;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 12px 14px 0 var(--navy);
+}
+
+.hero-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: start;
+}
+
+.hero h1 {
   margin: 0;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: var(--display-hero);
   font-optical-sizing: auto;
-  font-size: clamp(3.2rem, 8vw, 7.4rem);
+  /* All caps needs positive tracking to breathe, and runs wider than title
+     case, so it sits a step smaller than the mixed-case size did. */
+  font-size: clamp(2.1rem, 4.7vw, 4.1rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: 0.012em;
+  text-transform: uppercase;
+  color: var(--navy);
+  /* Hard offset shadow, same language as the CTA and image frame, so the
+     headline lifts off the page rather than sitting flat on it. */
+  text-shadow: 4px 4px 0 rgba(36, 65, 94, 0.13);
+}
+
+.hero h1 em {
+  display: block;
+  font-style: normal;
+  color: var(--pink-deep);
+}
+
+.hero-sub {
+  max-width: 40ch;
+  margin: clamp(18px, 2.6vh, 28px) 0 0;
+  font-size: clamp(1.02rem, 1.45vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--navy-soft);
+}
+
+.hero-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: clamp(18px, 2.6vh, 26px) 0 clamp(24px, 3.6vh, 34px);
+  text-decoration: none;
+  color: var(--navy);
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--gold);
+}
+
+.stars svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.hero-rating b {
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 0.95;
+  letter-spacing: 0.01em;
+}
+
+/* Scoped to a class, not a bare `span` — a descendant `span` selector here also
+   matches .stars and would repaint the gold stars in the label's colour. */
+.rating-label {
+  font-size: 0.82rem;
+  color: var(--navy-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(30, 54, 79, 0.5);
+}
+
+.hero-rating:hover .rating-label {
+  text-decoration-color: currentColor;
+}
+
+/* The big CTA: hard navy outline + offset shadow, pressing into the shadow on
+   hover. Used in the hero and again at the foot of the page. */
+.quote-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: min(440px, 100%);
+  min-height: 96px;
+  padding: 14px 17px 14px 34px;
+  border: 3px solid var(--navy);
+  border-radius: 999px;
+  background: var(--pink);
+  color: var(--navy);
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  cursor: pointer;
+  box-shadow: 9px 10px 0 var(--navy);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.quote-button:hover,
+.quote-button:focus-visible {
+  background: var(--pink-light);
+  box-shadow: 4px 5px 0 var(--navy);
+  transform: translate(5px, 5px);
+}
+
+/* Compact bar variant: no arrow badge, sized to keep the nav at --nav-h. */
+.quote-button--nav {
+  width: auto;
+  min-height: 46px;
+  padding: 0 22px;
+  border-width: 2px;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  letter-spacing: -0.02em;
+  box-shadow: 4px 4px 0 var(--seafoam-tint);
+}
+
+.quote-button--nav:hover,
+.quote-button--nav:focus-visible {
+  box-shadow: 2px 2px 0 var(--seafoam-tint);
+  transform: translate(2px, 2px);
+}
+
+.quote-button-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+}
+
+.quote-button-icon svg {
+  width: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .window-scene {
@@ -168,28 +350,190 @@ textarea {
   display: none;
 }
 
-/* No transform / opacity / will-change here: a transformed or opacity-animated
-   ancestor would become the card's "backdrop root" and break its
-   backdrop-filter in Chrome. Centering is done with flex instead. */
-/* Each step gets its own top anchor (set in the .is-step-* rules) so the
-   shorter step 1 can sit lower on the page while the taller step 2 starts
-   higher without running under the masthead. No transform here — a
-   transformed ancestor would break the card's backdrop-filter in Chrome. */
-.quote-shell {
-  position: absolute;
-  right: clamp(18px, 5vw, 76px);
-  z-index: 5;
-  width: min(500px, calc(100% - 36px));
-  pointer-events: none;
-  transition: top 0.45s ease;
+/* ---------- about ---------- */
+
+.about {
+  padding: clamp(40px, 6vh, 74px) clamp(18px, 5vw, 60px) clamp(66px, 11vh, 118px);
 }
 
-.quote-shell.is-step-1 {
-  top: clamp(140px, 21vh, 260px);
+.about-inner {
+  max-width: 1040px;
+  margin: 0 auto;
 }
 
-.quote-shell.is-step-2 {
-  top: clamp(80px, 10vh, 124px);
+.about h2 {
+  margin: 0;
+  max-width: 20ch;
+  font-family: var(--display);
+  font-size: clamp(2rem, 4.4vw, 3.3rem);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+}
+
+.about-lede {
+  max-width: 56ch;
+  margin: 22px 0 0;
+  font-size: clamp(1rem, 1.4vw, 1.12rem);
+  line-height: 1.65;
+  color: var(--navy-soft);
+}
+
+.about-grid {
+  margin-top: clamp(42px, 7vh, 68px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(24px, 3vw, 42px);
+}
+
+.about-point {
+  padding-top: 20px;
+  border-top: 3px solid var(--navy);
+}
+
+.about-point h3 {
+  margin: 0 0 10px;
+  font-family: var(--display);
+  font-size: clamp(1.12rem, 1.8vw, 1.32rem);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  color: var(--navy);
+}
+
+.about-point p {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.6;
+  color: var(--navy-soft);
+}
+
+/* ---------- contact + footer ---------- */
+
+.contact {
+  padding: clamp(64px, 10vh, 108px) clamp(18px, 5vw, 60px) 0;
+  background: var(--navy);
+  color: var(--seafoam);
+}
+
+.contact-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
+  justify-items: start;
+}
+
+.contact-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 40px);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-list li {
+  display: grid;
+  gap: 6px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(223, 243, 234, 0.24);
+}
+
+.contact-list span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: rgba(223, 243, 234, 0.85);
+}
+
+.contact-list a,
+.contact-list p {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.05rem, 1.8vw, 1.26rem);
+  font-weight: 500;
+  color: var(--seafoam-tint);
+  text-decoration: none;
+}
+
+/* The address is longer than its column at display size, and breaking a domain
+   mid-word reads as a typo — step it down so it fits on one line instead. */
+.contact-list a[href^="mailto:"] {
+  font-size: clamp(0.88rem, 1.1vw, 0.98rem);
+  overflow-wrap: break-word;
+}
+
+.contact-list a:hover {
+  color: var(--pink);
+}
+
+.contact .quote-button {
+  margin: clamp(36px, 5vh, 54px) 0 0;
+  min-height: 74px;
+  padding-left: 28px;
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  border-color: var(--seafoam-tint);
+  box-shadow: 7px 8px 0 var(--seafoam-tint);
+}
+
+.contact .quote-button:hover,
+.contact .quote-button:focus-visible {
+  box-shadow: 3px 4px 0 var(--seafoam-tint);
+}
+
+.contact .quote-button-icon {
+  width: 50px;
+  height: 50px;
+}
+
+.contact .quote-button-icon svg {
+  width: 21px;
+}
+
+.site-footer {
+  width: 100%;
+  max-width: 1040px;
+  margin: clamp(52px, 8vh, 84px) auto 0;
+  padding: 20px 0 26px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid rgba(223, 243, 234, 0.2);
+  font-size: 0.84rem;
+  color: rgba(223, 243, 234, 0.85);
+}
+
+.site-footer em {
+  font-family: var(--display);
+  font-style: normal;
+  font-size: 0.98rem;
+  color: var(--pink);
+}
+
+/* ---------- quote dialog ---------- */
+
+.quote-dialog {
+  width: min(540px, calc(100% - 28px));
+  max-height: calc(100svh - 40px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  color: var(--navy);
+}
+
+.quote-dialog::backdrop {
+  background: rgba(7, 29, 61, 0.66);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.quote-card-shell {
+  position: relative;
 }
 
 .quote-card {
@@ -197,42 +541,45 @@ textarea {
   display: grid;
   gap: 24px;
   width: 100%;
-  padding: clamp(22px, 3.4vw, 32px);
-  border-radius: 10px;
-  pointer-events: auto;
-  background:
-    linear-gradient(128deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.06) 26%, transparent 46%),
-    linear-gradient(155deg, rgba(238, 253, 255, 0.66), rgba(193, 232, 244, 0.46));
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-  /* Entrance lives on the card itself (its own transform doesn't disable its
-     backdrop-filter). Keep the glass blur static; animating backdrop-filter is
-     costly in Chrome and can make the card hitch as it appears. */
-  opacity: 0;
-  transform: translateY(38px);
-  will-change: opacity, transform;
-  animation: quoteEnter 0.85s ease 2.35s both;
-  box-shadow:
-    0 24px 80px rgba(1, 30, 45, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    inset 1px 0 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(1, 30, 45, 0.18),
-    inset -1px 0 0 rgba(1, 30, 45, 0.1);
-  overflow: hidden;
+  max-height: calc(100svh - 40px);
+  overflow-y: auto;
+  padding: clamp(24px, 3.4vw, 34px);
+  border: 3px solid var(--navy);
+  border-radius: 18px;
+  background: var(--seafoam-tint);
+  box-shadow: 10px 12px 0 var(--navy);
+  animation: quoteEnter 0.32s ease both;
 }
 
-.quote-card.is-entered {
-  will-change: auto;
+.dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(7, 29, 61, 0.1);
+  color: var(--navy);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dialog-close:hover {
+  background: rgba(7, 29, 61, 0.2);
 }
 
 .quote-card h2 {
-  margin: -6px 0 2px;
-  color: var(--deep);
+  margin: 0;
+  color: var(--navy);
   font-family: var(--display);
-  font-size: clamp(1.55rem, 2.6vw, 2.2rem);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
   font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
+  line-height: 1.05;
 }
 
 .form-heading {
@@ -245,18 +592,20 @@ textarea {
 .step-track {
   display: flex;
   gap: 6px;
+  flex: none;
+  padding-right: 44px;
 }
 
 .step-track span {
   width: 22px;
   height: 4px;
   border-radius: 999px;
-  background: rgba(8, 74, 103, 0.18);
+  background: rgba(7, 29, 61, 0.16);
   transition: background 200ms ease;
 }
 
 .step-track span.is-active {
-  background: var(--blue);
+  background: var(--pink);
 }
 
 .step-frame {
@@ -266,7 +615,7 @@ textarea {
 
 .step-content {
   display: grid;
-  gap: 28px;
+  gap: 26px;
   animation: stepContentEnter 220ms ease both;
 }
 
@@ -275,9 +624,9 @@ textarea {
   align-items: flex-start;
   gap: 10px;
   padding: 12px 14px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(8, 74, 103, 0.2);
+  border-radius: 10px;
+  background: var(--seafoam);
+  border: 1px solid rgba(7, 29, 61, 0.16);
 }
 
 .estimate-icon {
@@ -287,39 +636,39 @@ textarea {
   width: 22px;
   height: 22px;
   border-radius: 999px;
-  background: var(--blue);
+  background: var(--navy);
   color: white;
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .estimate-note p {
   margin: 0;
-  color: #164a60;
+  color: var(--navy);
   font-size: 0.88rem;
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1.45;
 }
 
 .form-status {
   margin: 0;
   padding: 12px 14px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(8, 74, 103, 0.2);
-  color: #164a60;
+  border-radius: 10px;
+  background: var(--seafoam);
+  border: 1px solid rgba(7, 29, 61, 0.16);
+  color: var(--navy);
   font-size: 0.88rem;
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1.45;
 }
 
 .form-status--error {
-  border-color: rgba(211, 58, 48, 0.35);
+  border-color: rgba(211, 58, 48, 0.4);
   color: #b3261e;
 }
 
 .step-content > button {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .is-flash input,
@@ -328,14 +677,14 @@ textarea {
   animation: fieldFlash 600ms ease;
 }
 
-.is-flash span:first-child {
+.is-flash > span:first-child {
   color: #b3261e;
 }
 
 @keyframes fieldFlash {
   0%,
   100% {
-    border-color: rgba(8, 74, 103, 0.2);
+    border-color: rgba(7, 29, 61, 0.18);
     box-shadow: none;
   }
   25%,
@@ -354,17 +703,17 @@ textarea {
 label {
   display: grid;
   gap: 8px;
-  color: #17475b;
-  font-size: 0.82rem;
-  font-weight: 800;
+  color: var(--navy-mid);
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .service-field {
   display: grid;
   gap: 8px;
-  color: #17475b;
-  font-size: 0.82rem;
-  font-weight: 800;
+  color: var(--navy-mid);
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .segmented-control {
@@ -373,32 +722,36 @@ label {
   gap: 12px;
 }
 
-.segmented-control button {
+/* Scoped past `.quote-card button` below, which would otherwise paint every
+   unselected option pink. */
+.quote-card .segmented-control button {
   min-height: 48px;
-  border: 1px solid rgba(8, 74, 103, 0.2);
-  background: rgba(255, 255, 255, 0.72);
-  color: #17475b;
+  border: 1px solid rgba(7, 29, 61, 0.2);
+  background: white;
+  color: var(--navy-mid);
+  font-family: var(--body);
+  font-size: 0.94rem;
+  font-weight: 600;
   box-shadow: none;
 }
 
-.segmented-control button.is-selected {
-  border-color: var(--blue);
-  background: var(--blue);
-  color: white;
-  box-shadow: 0 10px 20px rgba(7, 103, 137, 0.18);
+.quote-card .segmented-control button.is-selected {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: var(--seafoam-tint);
 }
 
 input,
 select,
 textarea {
   width: 100%;
-  /* Override the inherited label font-size (0.82rem): anything under 16px
+  /* Override the inherited label font-size (0.8rem): anything under 16px
      makes mobile Safari/Chrome zoom the page in on focus. */
   font-size: 16px;
-  border: 1px solid rgba(8, 74, 103, 0.2);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.86);
-  color: var(--deep);
+  border: 1px solid rgba(7, 29, 61, 0.2);
+  border-radius: 10px;
+  background: white;
+  color: var(--navy);
   outline: none;
 }
 
@@ -434,8 +787,8 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(84, 211, 238, 0.32);
+  border-color: var(--pink-deep);
+  box-shadow: 0 0 0 3px rgba(255, 111, 145, 0.35);
 }
 
 .button-row {
@@ -444,40 +797,61 @@ textarea:focus {
   gap: 12px;
 }
 
-button {
+.quote-card button {
   position: relative;
-  min-height: 48px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--blue);
-  color: white;
-  font-weight: 900;
+  min-height: 52px;
+  border: 2px solid var(--navy);
+  border-radius: 10px;
+  background: var(--pink);
+  color: var(--navy);
+  font-family: var(--display);
+  font-size: 1.08rem;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 14px 28px rgba(7, 103, 137, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 4px 5px 0 var(--navy);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
 }
 
-.secondary-button {
-  background: rgba(7, 64, 87, 0.12);
-  color: #164a60;
+.quote-card button:hover:not(:disabled) {
+  background: var(--pink-light);
+  box-shadow: 2px 2px 0 var(--navy);
+  transform: translate(2px, 3px);
+}
+
+.quote-card .secondary-button {
+  background: transparent;
+  color: var(--navy-mid);
+  box-shadow: 3px 4px 0 rgba(7, 29, 61, 0.35);
+}
+
+.quote-card .dialog-close {
+  min-height: 0;
+  border: 0;
   box-shadow: none;
+  font-family: var(--body);
+  transform: none;
 }
 
-button:hover {
-  filter: brightness(1.05);
-}
-
-button:disabled {
-  background: #b3bfc4;
-  color: rgba(255, 255, 255, 0.86);
+.quote-card button:disabled {
+  border-color: rgba(7, 29, 61, 0.25);
+  background: rgba(7, 29, 61, 0.1);
+  color: rgba(7, 29, 61, 0.42);
   cursor: not-allowed;
   box-shadow: none;
-  filter: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--pink-deep);
+  outline-offset: 3px;
 }
 
 @keyframes quoteEnter {
   from {
     opacity: 0;
-    transform: translateY(38px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -496,80 +870,25 @@ button:disabled {
   }
 }
 
-.about {
-  background: var(--foam);
-  color: #08283a;
-  padding: clamp(72px, 12vh, 140px) clamp(18px, 5vw, 76px);
-}
+/* ---------- responsive ---------- */
 
-.about-inner {
-  max-width: 1040px;
-  margin: 0 auto;
-}
-
-.about-eyebrow {
-  margin: 0 0 14px;
-  font-family: var(--display);
-  font-size: 0.92rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--blue);
-}
-
-.about h2 {
-  margin: 0;
-  max-width: 18ch;
-  font-family: var(--display);
-  font-size: clamp(2.1rem, 4.6vw, 3.5rem);
-  font-weight: 500;
-  line-height: 1.04;
-  letter-spacing: -0.015em;
-  color: var(--deep);
-}
-
-.about-lede {
-  max-width: 56ch;
-  margin: 24px 0 0;
-  font-size: clamp(1.02rem, 1.5vw, 1.18rem);
-  line-height: 1.6;
-  color: rgba(8, 40, 58, 0.82);
-}
-
-.about-grid {
-  margin-top: clamp(44px, 7vh, 72px);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(24px, 3vw, 44px);
-}
-
-.about-point {
-  padding-top: 22px;
-  border-top: 2px solid rgba(8, 126, 164, 0.28);
-}
-
-.about-point h3 {
-  margin: 0 0 10px;
-  font-family: var(--display);
-  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--deep);
-}
-
-.about-point p {
-  margin: 0;
-  font-size: 1rem;
-  line-height: 1.58;
-  color: rgba(8, 40, 58, 0.78);
-}
-
-@media (max-width: 980px) {
+@media (max-width: 940px) {
   .hero {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    /* Stacked, the hero is naturally taller than the screen — let it size to
+       its content instead of stretching to a full viewport. */
     min-height: 0;
-    padding-bottom: 40px;
+    gap: clamp(28px, 5vh, 44px);
+  }
+
+  /* Copy and CTA lead on a stacked layout; the media follows directly under. */
+  .hero-inner {
+    order: -1;
+  }
+
+  .hero-media {
+    aspect-ratio: 16 / 10;
+    box-shadow: 8px 9px 0 var(--navy);
   }
 
   .about-grid {
@@ -578,59 +897,60 @@ button:disabled {
   }
 
   .about-point {
-    margin-top: 28px;
+    margin-top: 26px;
   }
 
-  .hero-copy {
-    order: 1;
-    width: min(620px, calc(100% - 36px));
-    margin-top: clamp(90px, 15vh, 120px);
-  }
-
-  /* Below this width the copy and card stack instead of sitting
-     side by side, so the locale line and card flow after the copy
-     (via flex order) instead of being absolutely positioned over
-     the masthead, where they no longer line up with anything. */
-  .locale {
-    position: static;
-    order: 2;
-    width: min(500px, 100%);
-    margin: 32px 0 0;
-    opacity: 0;
-    transform: translateY(38px);
-    animation: quoteEnter 0.85s ease 2.35s both;
-  }
-
-  .quote-shell {
-    position: static;
-    display: block;
-    order: 3;
-    width: 100%;
-    max-width: 500px;
-    margin: 14px 0 0;
+  .contact-list {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 }
 
-@media (max-width: 680px) {
-  .hero {
-    padding-top: 16px;
+/* Three columns won't fit — stack to a centred brand with the links and CTA
+   on a second row. The hero is already content-sized below 940px, so the
+   taller bar doesn't affect --nav-h. */
+@media (max-width: 800px) {
+  .site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 18px;
   }
 
-  .hero-copy {
-    width: calc(100% - 28px);
-    margin-top: clamp(80px, 14vh, 104px);
+  .nav-links {
+    order: 2;
   }
 
-  .hero-copy h1 {
-    font-size: clamp(3rem, 15vw, 4.8rem);
+  .brand {
+    order: 1;
+    width: 100%;
+    justify-content: center;
   }
 
-  .brand-name {
-    font-size: clamp(1rem, 5vw, 1.2rem);
+  .nav-quote {
+    order: 3;
+  }
+}
+
+@media (max-width: 620px) {
+  .brand-mark {
+    width: 38px;
+    height: 38px;
   }
 
-  .quote-shell {
-    max-width: none;
+  .nav-links {
+    gap: 18px;
+  }
+
+  .quote-button {
+    width: 100%;
+    min-height: 80px;
+    padding-left: 26px;
+  }
+
+  .quote-button-icon {
+    width: 54px;
+    height: 54px;
   }
 
   .field-grid {
@@ -638,7 +958,11 @@ button:disabled {
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 400px) {
+  .brand-name span {
+    display: none;
+  }
+
   .button-row {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -656,12 +980,6 @@ button:disabled {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-  }
-
-  .quote-card,
-  .locale {
-    opacity: 1;
-    transform: none;
-    will-change: auto;
+    transition-duration: 0.01ms !important;
   }
 }

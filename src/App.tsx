@@ -5,10 +5,9 @@ import {
   useRef,
   useState,
   type AnimationEvent,
-  type CSSProperties,
   type FormEvent,
 } from "react";
-import logoMarkUrl from "./assets/crystal-blue-mark.svg";
+import logoMarkUrl from "./assets/dolphin-bay-mark.svg";
 import vistaUrl from "./assets/gulf-coast-vista.webp";
 
 type Pt = { x: number; y: number };
@@ -55,9 +54,11 @@ function roundRect(
 function drawGrime(ctx: CanvasRenderingContext2D, w: number, h: number) {
   const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
+  // Tuned for the light seafoam hero behind it: a soft misted-glass film, not
+  // the heavy grey haze the old dark photo hero could carry.
   const base = ctx.createLinearGradient(0, 0, w * 0.2, h);
-  base.addColorStop(0, "rgba(228, 232, 231, 0.56)");
-  base.addColorStop(1, "rgba(150, 162, 165, 0.5)");
+  base.addColorStop(0, "rgba(236, 246, 243, 0.44)");
+  base.addColorStop(1, "rgba(163, 188, 184, 0.36)");
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);
 
@@ -217,24 +218,9 @@ function makeSqueegeePainter(
   };
 }
 
-function decodeImage(src: string) {
-  return new Promise<void>((resolve) => {
-    const img = new Image();
-    img.src = src;
-
-    if (img.complete) {
-      void (img.decode?.() ?? Promise.resolve()).finally(resolve);
-      return;
-    }
-
-    img.onload = () => {
-      void (img.decode?.() ?? Promise.resolve()).finally(resolve);
-    };
-    img.onerror = () => resolve();
-  });
-}
-
-function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
+// Wipes a layer of grime off the hero, revealing the page underneath. There is
+// no photo to preload any more — the canvas simply clears to transparent.
+function WindowWipe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [done, setDone] = useState(false);
 
@@ -260,7 +246,7 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
     let canvasWidth = 0;
     let canvasHeight = 0;
 
-    const startWipe = async () => {
+    const startWipe = () => {
       const token = ++runToken;
       cancelAnimationFrame(raf);
       setDone(false);
@@ -295,12 +281,6 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
       // paint the initial dirty state before the wipe starts moving
       ctx.clearRect(0, 0, w, h);
       ctx.drawImage(grime, 0, 0, w, h);
-
-      await decodeImage(revealImageUrl);
-
-      if (token !== runToken) {
-        return;
-      }
 
       const featherT = 150;
       const tStart = -featherT;
@@ -423,7 +403,7 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
     });
 
     resizeObserver.observe(canvas);
-    void startWipe();
+    startWipe();
 
     return () => {
       runToken += 1;
@@ -431,7 +411,7 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
       window.clearTimeout(resizeTimer);
       cancelAnimationFrame(raf);
     };
-  }, [revealImageUrl]);
+  }, []);
 
   return (
     <canvas
@@ -442,13 +422,8 @@ function WindowWipe({ revealImageUrl }: { revealImageUrl: string }) {
   );
 }
 
-function QuoteForm({ onStepChange }: { onStepChange?: (step: number) => void }) {
+function QuoteForm() {
   const [step, setStep] = useState(1);
-
-  useEffect(() => {
-    onStepChange?.(step);
-  }, [step, onStepChange]);
-
   const [stepHeight, setStepHeight] = useState<number>();
   const [flashFields, setFlashFields] = useState<string[]>([]);
   const [cardEntered, setCardEntered] = useState(false);
@@ -753,58 +728,123 @@ function QuoteForm({ onStepChange }: { onStepChange?: (step: number) => void }) 
   );
 }
 
-function Hero() {
-  const [quoteStep, setQuoteStep] = useState(1);
-
+function SiteNav({ onQuote }: { onQuote: () => void }) {
   return (
-    <header className="hero" style={{ "--vista": `url(${vistaUrl})` } as CSSProperties}>
-      <div className="masthead">
+    <nav className="site-nav" aria-label="Main">
+      <div className="nav-links">
+        <a href="#about">About Us</a>
+        <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
+          Reviews
+        </a>
+        <a href="#contact">Contact</a>
+      </div>
+
+      <a className="brand" href="#top">
         <img className="brand-mark" src={logoMarkUrl} alt="" aria-hidden="true" />
-        <span className="brand-name">Crystal Blue Window Cleaning</span>
-      </div>
+        <span className="brand-name">
+          <b>Dolphin Bay</b>
+          <span>Window Cleaning</span>
+        </span>
+      </a>
 
-      <p className="locale">
-        <svg className="locale-pin" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"
-          />
+      <div className="nav-quote">
+        <QuoteButton onQuote={onQuote} compact />
+      </div>
+    </nav>
+  );
+}
+
+// TODO: replace with the real Google Business review link before launch.
+const GOOGLE_REVIEWS_URL = "https://search.google.com/local/reviews?placeid=REPLACE_ME";
+
+function StarRow() {
+  return (
+    <span className="stars" aria-hidden="true">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <svg key={i} viewBox="0 0 24 24">
+          <path d="M12 2.6l2.9 5.88 6.5.95-4.7 4.58 1.11 6.47L12 17.43l-5.81 3.05 1.11-6.47-4.7-4.58 6.5-.95L12 2.6z" />
         </svg>
-        Serving the greater Pensacola area
-      </p>
+      ))}
+    </span>
+  );
+}
 
-      <div className="hero-copy">
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h13M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+function QuoteButton({
+  onQuote,
+  compact,
+}: {
+  onQuote: () => void;
+  compact?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={`quote-button${compact ? " quote-button--nav" : ""}`}
+      onClick={onQuote}
+    >
+      <span>Get Quote</span>
+      {compact ? null : (
+        <span className="quote-button-icon" aria-hidden="true">
+          <ArrowIcon />
+        </span>
+      )}
+    </button>
+  );
+}
+
+function Hero({ onQuote }: { onQuote: () => void }) {
+  return (
+    <header id="top" className="hero">
+      <div className="hero-media">
+        <img
+          src={vistaUrl}
+          alt="Clear turquoise Gulf water meeting a bright blue sky at the horizon"
+        />
+      </div>
+
+      <div className="hero-inner">
         <h1>
-          Let the light
-          <br />
-          back in.
+          Your Pane is
+          <em>Our Pleasure</em>
         </h1>
+        <p className="hero-sub">
+          Our goal is to provide quality, satisfying service to Greater
+          Pensacola residents. We believe showing up on time matters, and we
+          treat every customer with the respect you deserve.
+        </p>
+
+        <a
+          className="hero-rating"
+          href={GOOGLE_REVIEWS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <StarRow />
+          <b aria-label="Rated 5 out of 5 stars">5.0</b>
+          <span className="rating-label">Read our Google reviews</span>
+        </a>
+
+        <QuoteButton onQuote={onQuote} />
       </div>
 
-      <WindowWipe revealImageUrl={vistaUrl} />
-
-      <div id="quote" className={`quote-shell is-step-${quoteStep}`}>
-        <QuoteForm onStepChange={setQuoteStep} />
-      </div>
+      <WindowWipe />
     </header>
   );
 }
 
 function About() {
   return (
-    <section id="about" className="about" aria-label="About Crystal Blue Window Cleaning">
+    <section id="about" className="about" aria-label="About Dolphin Bay Window Cleaning">
       <div className="about-inner">
-        <p className="about-eyebrow">About us</p>
-        <h2>
-          A local crew that treats your windows
-          <br />
-          like our own.
-        </h2>
-        <p className="about-lede">
-          Crystal Blue is a small, owner-operated window cleaning service
-          based in the Pensacola area. We show up when we say we will and
-          leave your glass spotless.
-        </p>
+        <h2>A local crew that treats your windows like our own.</h2>
 
         <div className="about-grid">
           <div className="about-point">
@@ -815,9 +855,9 @@ function About() {
             </p>
           </div>
           <div className="about-point">
-            <h3>Houses and storefronts</h3>
+            <h3>Commercial and residential</h3>
             <p>
-              Single-story homes, two-story homes, small storefronts — we
+              Single-story and two-story homes, offices, and retail spaces — we
               quote exterior-only or full inside-and-out cleans either way.
             </p>
           </div>
@@ -834,11 +874,92 @@ function About() {
   );
 }
 
+function Contact({ onQuote }: { onQuote: () => void }) {
+  return (
+    <section id="contact" className="contact" aria-label="Contact Dolphin Bay Window Cleaning">
+      <div className="contact-inner">
+        <ul className="contact-list">
+          <li>
+            <span>Call or text</span>
+            <a href="tel:+18505550134">(850) 555-0134</a>
+          </li>
+          <li>
+            <span>Email</span>
+            <a href="mailto:hello@dolphinbaywindowcleaning.com">
+              hello@dolphinbaywindowcleaning.com
+            </a>
+          </li>
+          <li>
+            <span>Service area</span>
+            <p>Greater Pensacola</p>
+          </li>
+        </ul>
+
+        <QuoteButton onQuote={onQuote} />
+
+        <footer className="site-footer">
+          <p>© {new Date().getFullYear()} Dolphin Bay Window Cleaning</p>
+          <em>Your Pane is Our Pleasure</em>
+        </footer>
+      </div>
+    </section>
+  );
+}
+
+function QuoteDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (open && !dialog.open) {
+      dialog.showModal();
+    } else if (!open && dialog.open) {
+      dialog.close();
+    }
+  }, [open]);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="quote-dialog"
+      aria-label="Request a window cleaning quote"
+      onClose={onClose}
+      // Clicking the backdrop targets the <dialog> itself, not the card inside.
+      onClick={(event) => {
+        if (event.target === dialogRef.current) onClose();
+      }}
+    >
+      {open ? (
+        <div className="quote-card-shell">
+          <QuoteForm />
+          <button
+            type="button"
+            className="dialog-close"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
+    </dialog>
+  );
+}
+
 export default function App() {
+  const [quoteOpen, setQuoteOpen] = useState(false);
+  const openQuote = () => setQuoteOpen(true);
+  const closeQuote = () => setQuoteOpen(false);
+
   return (
     <>
-      <Hero />
+      <SiteNav onQuote={openQuote} />
+      <Hero onQuote={openQuote} />
       <About />
+      <Contact onQuote={openQuote} />
+      <QuoteDialog open={quoteOpen} onClose={closeQuote} />
     </>
   );
 }
