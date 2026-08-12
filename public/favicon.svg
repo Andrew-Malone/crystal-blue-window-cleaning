@@ -20,19 +20,19 @@
     <path d="M74 21C80 19 85 19 89 21C85 25 81 29 78 33Z"/>
     <path d="M49 47C43 53 38 58 33 62C40 59 47 56 53 53Z" fill="#DE6076" opacity="0.8"/>
   </g>
-  <circle cx="77" cy="26" r="2.1" fill="#1D3E68"/>
+  <circle cx="77" cy="26" r="2.1" fill="#14335C"/>
 
   <path
     d="M4 74C18 66 32 80 48 80C66 80 78 68 90 62"
     fill="none"
-    stroke="#1D3E68"
+    stroke="#14335C"
     stroke-width="7.5"
     stroke-linecap="round"
   />
   <path
     d="M14 88C30 94 54 92 76 84"
     fill="none"
-    stroke="#33578A"
+    stroke="#27497C"
     stroke-width="5"
     stroke-linecap="round"
   />

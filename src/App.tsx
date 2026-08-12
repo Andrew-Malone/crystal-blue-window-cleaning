@@ -8,7 +8,6 @@ import {
   type FormEvent,
 } from "react";
 import logoMarkUrl from "./assets/dolphin-bay-mark.svg";
-import vistaUrl from "./assets/gulf-coast-vista.webp";
 
 type Pt = { x: number; y: number };
 
@@ -867,11 +866,10 @@ function QuoteButton({ onQuote }: { onQuote: () => void }) {
 function Hero({ onQuote }: { onQuote: () => void }) {
   return (
     <header id="top" className="hero">
-      <div className="hero-media">
-        <img
-          src={vistaUrl}
-          alt="Clear turquoise Gulf water meeting a bright blue sky at the horizon"
-        />
+      {/* Placeholder until real photography lands — swap this div's contents
+          for an <img>/<video> and the frame around it stays as-is. */}
+      <div className="hero-media" role="img" aria-label="Photo placeholder">
+        <span className="hero-media-label">Image placeholder</span>
       </div>
 
       <div className="hero-inner">
@@ -899,7 +897,8 @@ function Hero({ onQuote }: { onQuote: () => void }) {
         <QuoteButton onQuote={onQuote} />
       </div>
 
-      <WindowWipe />
+      {/* On-load squeegee wipe, disabled for now. The component and its styles
+          are intact — re-render <WindowWipe /> here to bring it back. */}
     </header>
   );
 }
@@ -942,28 +941,25 @@ function Contact({ onQuote }: { onQuote: () => void }) {
   return (
     <section id="contact" className="contact" aria-label="Contact Dolphin Bay Window Cleaning">
       <div className="contact-inner">
-        <ul className="contact-list">
-          <li>
-            <span>Call or text</span>
-            <a href="tel:+18505550134">(850) 555-0134</a>
-          </li>
-          <li>
-            <span>Email</span>
-            <a href="mailto:hello@dolphinbaywindowcleaning.com">
+        <div className="contact-main">
+          <div className="contact-details">
+            <a className="contact-phone" href="tel:+18505550134">
+              (850) 555-0134
+            </a>
+            <a
+              className="contact-email"
+              href="mailto:hello@dolphinbaywindowcleaning.com"
+            >
               hello@dolphinbaywindowcleaning.com
             </a>
-          </li>
-          <li>
-            <span>Service area</span>
-            <p>Greater Pensacola</p>
-          </li>
-        </ul>
+          </div>
 
-        <QuoteButton onQuote={onQuote} />
+          <QuoteButton onQuote={onQuote} />
+        </div>
 
         <footer className="site-footer">
           <p>© {new Date().getFullYear()} Dolphin Bay Window Cleaning</p>
-          <em>Your Pane is Our Pleasure</em>
+          <p>Serving the greater Pensacola area</p>
         </footer>
       </div>
     </section>

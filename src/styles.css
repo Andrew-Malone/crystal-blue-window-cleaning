@@ -1,23 +1,23 @@
 :root {
-  /* Vintage navy: desaturated, grey-leaning slate rather than a saturated
-     modern navy — reads worn-in and established. */
-  --navy: #1d3e68;
-  --navy-mid: #33578a;
+  /* Deep, clearly blue navy — the page's structural colour, used for the nav,
+     the contact block, and every hard offset shadow. */
+  --navy: #14335c;
+  --navy-mid: #27497c;
   /* Body copy sits close to full navy — the old 0.74 washed out against the
      pale ground and was hard to read. */
-  --navy-soft: rgba(26, 55, 92, 0.94);
-  /* Washed vintage green: desaturated and blue-leaning so it reads as the
-     navy's faded cousin rather than a fresh mint. */
-  --seafoam: #d5e4d9;
-  --seafoam-deep: #a6c0ae;
-  --seafoam-tint: #edf2ec;
+  --navy-soft: rgba(18, 45, 82, 0.94);
+  /* Washed vintage green: still desaturated and blue-leaning, but with enough
+     chroma left to read as green rather than grey. */
+  --seafoam: #cbe0cf;
+  --seafoam-deep: #97bda1;
+  --seafoam-tint: #e8f1e7;
   --pink: #ff8494;
   --pink-light: #ffa0ac;
   --pink-deep: #d9536a;
   --gold: #f0b429;
   /* Height of the sticky nav, subtracted from the hero so the hero fills the
-     first screen exactly and the next section starts below the fold. */
-  /* Must match the rendered bar: 46px CTA + 2 x 11px padding. */
+     first screen exactly and the next section starts below the fold. Must
+     match the rendered bar: 44px brand mark + 2 x 12px padding. */
   --nav-h: 68px;
   --display: "Bitter", Georgia, "Times New Roman", serif;
   /* Used only for the hero headline. */
@@ -25,7 +25,7 @@
   --body: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   color: var(--navy);
-  background: var(--seafoam-tint);
+  background: var(--seafoam);
   font-family: var(--body);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -46,7 +46,7 @@ body {
   min-width: 320px;
   overflow-x: hidden;
   overscroll-behavior-y: none;
-  background: var(--seafoam-tint);
+  background: var(--seafoam);
 }
 
 a {
@@ -88,7 +88,6 @@ select {
   justify-self: center;
   text-decoration: none;
 }
-
 
 .brand-mark {
   width: 44px;
@@ -166,9 +165,7 @@ select {
   min-height: calc(100vh - var(--nav-h));
   gap: clamp(30px, 4.5vw, 66px);
   padding: clamp(30px, 5vh, 60px) clamp(18px, 5vw, 60px) clamp(40px, 6vh, 76px);
-  background:
-    radial-gradient(ellipse 80% 70% at 20% 0%, rgba(168, 220, 201, 0.6), transparent 68%),
-    linear-gradient(180deg, var(--seafoam), var(--seafoam-tint));
+  background: var(--seafoam);
 }
 
 /* Media sits in the hero's left column so it is visible without scrolling.
@@ -177,9 +174,12 @@ select {
 .hero-media {
   position: relative;
   z-index: 2;
+  display: grid;
+  place-items: center;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 20px;
+  background: #c9cdd0;
   box-shadow: 12px 14px 0 var(--navy);
 }
 
@@ -188,6 +188,14 @@ select {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.hero-media-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(20, 51, 92, 0.42);
 }
 
 .hero-inner {
@@ -343,7 +351,7 @@ select {
   align-content: center;
   min-height: calc(64vh - var(--nav-h));
   padding: clamp(56px, 10vh, 110px) clamp(18px, 5vw, 60px);
-  background: linear-gradient(180deg, var(--seafoam), var(--seafoam-tint));
+  background: var(--seafoam);
 }
 
 .page-head-inner {
@@ -373,7 +381,8 @@ select {
 /* ---------- about ---------- */
 
 .about {
-  padding: clamp(40px, 6vh, 74px) clamp(18px, 5vw, 60px) clamp(66px, 11vh, 118px);
+  padding: clamp(56px, 9vh, 104px) clamp(18px, 5vw, 60px) clamp(66px, 11vh, 118px);
+  background: var(--seafoam);
 }
 
 .about-inner {
@@ -431,7 +440,7 @@ select {
 /* ---------- contact + footer ---------- */
 
 .contact {
-  padding: clamp(64px, 10vh, 108px) clamp(18px, 5vw, 60px) 0;
+  padding: clamp(44px, 6vh, 66px) clamp(18px, 5vw, 60px) 0;
   background: var(--navy);
   color: var(--seafoam);
 }
@@ -443,78 +452,75 @@ select {
   justify-items: start;
 }
 
-.contact-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(20px, 3vw, 40px);
+/* Details lead, CTA anchors the opposite end on the same baseline — the button
+   reads as one half of a pair rather than an afterthought parked below. */
+.contact-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(26px, 4vw, 56px);
   width: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
-.contact-list li {
+.contact-details {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
-.contact-list span {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-  color: rgba(223, 243, 234, 0.85);
-}
-
-.contact-list a,
-.contact-list p {
-  margin: 0;
+.contact-phone {
   font-family: var(--display);
-  font-size: clamp(1.05rem, 1.8vw, 1.26rem);
-  font-weight: 500;
+  font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
   color: var(--seafoam-tint);
   text-decoration: none;
 }
 
-/* The address is longer than its column at display size, and breaking a domain
-   mid-word reads as a typo — step it down so it fits on one line instead. */
-.contact-list a[href^="mailto:"] {
-  font-size: clamp(0.88rem, 1.1vw, 0.98rem);
+.contact-email {
+  font-size: clamp(0.95rem, 1.3vw, 1.06rem);
+  color: rgba(223, 243, 234, 0.9);
+  text-decoration: none;
   overflow-wrap: break-word;
 }
 
-.contact-list a:hover {
+.contact-phone:hover,
+.contact-email:hover {
   color: var(--pink);
 }
 
+
+/* On the dark block the pale outline read as pasted-on. Drop it and let a
+   deeper-navy offset carry the same raised language against the ground. */
 .contact .quote-button {
-  margin: clamp(36px, 5vh, 54px) 0 0;
-  min-height: 74px;
-  padding-left: 28px;
-  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
-  border-color: var(--seafoam-tint);
-  box-shadow: 7px 8px 0 var(--seafoam-tint);
+  margin: 0;
+  min-height: 70px;
+  padding: 12px 14px 12px 30px;
+  font-size: clamp(1.3rem, 2.3vw, 1.7rem);
+  border-color: #123055;
+  box-shadow: 6px 7px 0 #0d2242;
 }
 
 .contact .quote-button:hover,
 .contact .quote-button:focus-visible {
-  box-shadow: 3px 4px 0 var(--seafoam-tint);
+  box-shadow: 3px 3px 0 #0d2242;
+  transform: translate(3px, 4px);
 }
 
 .contact .quote-button-icon {
-  width: 50px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
 }
 
 .contact .quote-button-icon svg {
-  width: 21px;
+  width: 22px;
 }
 
 .site-footer {
   width: 100%;
   max-width: 1040px;
-  margin: clamp(52px, 8vh, 84px) auto 0;
-  padding: 20px 0 26px;
+  margin: clamp(28px, 4vh, 44px) auto 0;
+  padding: 0 0 22px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -524,11 +530,8 @@ select {
   color: rgba(223, 243, 234, 0.85);
 }
 
-.site-footer em {
-  font-family: var(--display);
-  font-style: normal;
-  font-size: 0.98rem;
-  color: var(--pink);
+.site-footer p {
+  margin: 0;
 }
 
 /* ---------- quote dialog ---------- */
@@ -917,9 +920,8 @@ textarea:focus {
     margin-top: 26px;
   }
 
-  .contact-list {
-    grid-template-columns: 1fr;
-    gap: 20px;
+  .contact-main {
+    justify-content: flex-start;
   }
 }
 
