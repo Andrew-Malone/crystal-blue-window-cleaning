@@ -420,8 +420,15 @@ function WindowWipe() {
   );
 }
 
+// The qualifying step (window count, stories, service type) is parked: the
+// form's job is to capture contact details and an address. Set this back to 1
+// to restore the two-step flow — the step state, the animated step frame, the
+// progress track and the Back button are all still wired up.
+const FIRST_STEP: number = 2;
+const IS_MULTI_STEP = FIRST_STEP === 1;
+
 function QuoteForm() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(FIRST_STEP);
   const [stepHeight, setStepHeight] = useState<number>();
   const [flashFields, setFlashFields] = useState<string[]>([]);
   const [cardEntered, setCardEntered] = useState(false);
@@ -525,10 +532,12 @@ function QuoteForm() {
     >
       <div className="form-heading">
         <h2>Request a visit</h2>
-        <div className="step-track" aria-label={`Step ${step} of 2`}>
-          <span className={step >= 1 ? "is-active" : ""} />
-          <span className={step >= 2 ? "is-active" : ""} />
-        </div>
+        {IS_MULTI_STEP ? (
+          <div className="step-track" aria-label={`Step ${step} of 2`}>
+            <span className={step >= 1 ? "is-active" : ""} />
+            <span className={step >= 2 ? "is-active" : ""} />
+          </div>
+        ) : null}
       </div>
 
       <div className="step-frame" style={{ height: stepHeight }}>
@@ -666,15 +675,19 @@ function QuoteForm() {
                 </p>
               ) : (
                 <>
-                  <div className="button-row">
-                    <button
-                      type="button"
-                      className="secondary-button"
-                      onClick={() => setStep(1)}
-                      disabled={submitState === "sending"}
-                    >
-                      Back
-                    </button>
+                  <div
+                    className={`button-row${IS_MULTI_STEP ? "" : " button-row--single"}`}
+                  >
+                    {IS_MULTI_STEP ? (
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={() => setStep(1)}
+                        disabled={submitState === "sending"}
+                      >
+                        Back
+                      </button>
+                    ) : null}
                     <button type="submit" disabled={!contactComplete || submitState === "sending"}>
                       {submitState === "sending" ? "Sending..." : "Request a Visit"}
                     </button>

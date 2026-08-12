@@ -11,6 +11,10 @@
   --seafoam: #cbe0cf;
   --seafoam-deep: #97bda1;
   --seafoam-tint: #e8f1e7;
+  /* The hero's two chessboard squares — their own tokens rather than reusing
+     --seafoam-tint, which is a text colour. */
+  --check-a: #e8f1e7;
+  --check-b: #cbe0cf;
   --pink: #ff8494;
   --pink-light: #ffa0ac;
   --pink-deep: #d9536a;
@@ -165,15 +169,13 @@ select {
   min-height: calc(100vh - var(--nav-h));
   gap: clamp(30px, 4.5vw, 66px);
   padding: clamp(30px, 5vh, 60px) clamp(18px, 5vw, 60px) clamp(40px, 6vh, 76px);
-  /* Chessboard ground. Each conic tile draws a 2x2 block, so the visible
-     square is half of --check-size. The two greens sit close together on
-     purpose — the pattern should read as texture behind the content, not
-     as a competing foreground element. */
+  /* Chessboard ground. The conic tile draws a 2x2 block, so a visible square
+     is half of --check-size. */
   --check-size: 160px;
   background-color: var(--seafoam);
   background-image: repeating-conic-gradient(
-    var(--seafoam-tint) 0% 25%,
-    var(--seafoam) 0% 50%
+    var(--check-a) 0% 25%,
+    var(--check-b) 0% 50%
   );
   background-size: var(--check-size) var(--check-size);
 }
@@ -217,7 +219,9 @@ select {
   justify-items: start;
   padding: clamp(24px, 2.8vw, 40px);
   border-radius: 20px;
-  background: #ffffff;
+  /* Canvas rather than pure white — reads as paper against the cool green
+     ground, and takes the glare off a large flat panel. */
+  background: #f8f4ea;
   box-shadow: 12px 14px 0 var(--navy);
 }
 
@@ -837,6 +841,11 @@ textarea:focus {
   display: grid;
   grid-template-columns: minmax(110px, 0.48fr) 1fr;
   gap: 12px;
+}
+
+/* No Back button alongside it, so submit takes the full width. */
+.button-row--single {
+  grid-template-columns: 1fr;
 }
 
 .quote-card button {
