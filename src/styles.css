@@ -169,15 +169,13 @@ select {
   min-height: calc(100vh - var(--nav-h));
   gap: clamp(30px, 4.5vw, 66px);
   padding: clamp(30px, 5vh, 60px) clamp(18px, 5vw, 60px) clamp(40px, 6vh, 76px);
-  /* Chessboard ground. The conic tile draws a 2x2 block, so a visible square
-     is half of --check-size. */
-  --check-size: 160px;
+  /* Seascape ground. Vite resolves and fingerprints this url() at build time,
+     so the asset is hashed like any other import. */
   background-color: var(--seafoam);
-  background-image: repeating-conic-gradient(
-    var(--check-a) 0% 25%,
-    var(--check-b) 0% 50%
-  );
-  background-size: var(--check-size) var(--check-size);
+  background-image: url("./assets/gulf-coast-vista.webp");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 /* Media sits in the hero's left column so it is visible without scrolling.
