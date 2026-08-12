@@ -468,6 +468,22 @@ select {
   gap: 4px;
 }
 
+/* Fixed icon width on both rows so the icons and the text after them line up
+   on a common left edge, despite the two very different type sizes. */
+.contact-icon {
+  width: 21px;
+  height: 21px;
+  flex: none;
+  color: var(--pink);
+}
+
+.contact-phone,
+.contact-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+}
+
 .contact-phone {
   font-family: var(--display);
   font-size: clamp(1.6rem, 3.2vw, 2.3rem);

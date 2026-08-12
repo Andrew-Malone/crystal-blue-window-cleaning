@@ -781,7 +781,7 @@ function SiteNav({ navigate }: { navigate: (path: string) => void }) {
     <nav className="site-nav" aria-label="Main">
       <div className="nav-links">
         <PageLink to="/about" navigate={navigate}>
-          About Us
+          Who We Are
         </PageLink>
         <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
           Reviews
@@ -841,6 +841,28 @@ function StarRow() {
         </svg>
       ))}
     </span>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg className="contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"
+      />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg className="contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4.2-8 4.8-8-4.8V6l8 4.8L20 6v2.2z"
+      />
+    </svg>
   );
 }
 
@@ -944,12 +966,14 @@ function Contact({ onQuote }: { onQuote: () => void }) {
         <div className="contact-main">
           <div className="contact-details">
             <a className="contact-phone" href="tel:+18505550134">
+              <PhoneIcon />
               (850) 555-0134
             </a>
             <a
               className="contact-email"
               href="mailto:hello@dolphinbaywindowcleaning.com"
             >
+              <MailIcon />
               hello@dolphinbaywindowcleaning.com
             </a>
           </div>
@@ -1020,8 +1044,8 @@ export default function App() {
 
       {path === "/about" ? (
         <PlaceholderPage
-          title="About Us"
-          blurb="This page is a placeholder — the full About Us story is still being written."
+          title="Who We Are"
+          blurb="This page is a placeholder — the full story is still being written."
         />
       ) : path === "/faq" ? (
         <PlaceholderPage
