@@ -1,7 +1,6 @@
 import {
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
   type AnimationEvent,
@@ -467,26 +466,6 @@ function QuoteForm() {
     form.streetAddress.trim() !== "" &&
     form.desiredDate !== "";
 
-  const estimate = useMemo(() => {
-    const windows = Number(form.windowCount);
-
-    if (!windows || !form.serviceType) {
-      return { low: null, high: null, note: "Residential visits start at $190." };
-    }
-
-    const rate = form.serviceType === "insideOutside" ? 15 : 10;
-    const storyMultiplier = form.stories === "two" ? 1.18 : 1;
-    const base = Math.max(190, Math.round(windows * rate * storyMultiplier));
-    const low = Math.max(190, Math.round(base * 0.9));
-    const high = Math.max(low + 35, Math.round(base * 1.25));
-
-    return {
-      low,
-      high,
-      note: `Estimated range: $${low}-$${high}. Final price depends on access, screens, buildup, and window type.`,
-    };
-  }, [form.serviceType, form.stories, form.windowCount]);
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -503,11 +482,7 @@ function QuoteForm() {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { Accept: "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          estimatedLow: estimate.low,
-          estimatedHigh: estimate.high,
-        }),
+        body: JSON.stringify(form),
       });
 
       setSubmitState(response.ok ? "sent" : "error");
@@ -606,20 +581,12 @@ function QuoteForm() {
                   </button>
                 </div>
               </div>
-              <div className="estimate-note">
-                <span className="estimate-icon" aria-hidden="true">$</span>
-                <p>{estimate.note}</p>
-              </div>
               <button type="button" onClick={handleContinue}>
                 Continue
               </button>
             </>
           ) : (
             <>
-              <div className="estimate-note">
-                <span className="estimate-icon" aria-hidden="true">$</span>
-                <p>{estimate.note}</p>
-              </div>
               <div className="field-grid">
                 <label>
                   <span>First name</span>

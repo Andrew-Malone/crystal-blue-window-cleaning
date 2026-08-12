@@ -165,7 +165,17 @@ select {
   min-height: calc(100vh - var(--nav-h));
   gap: clamp(30px, 4.5vw, 66px);
   padding: clamp(30px, 5vh, 60px) clamp(18px, 5vw, 60px) clamp(40px, 6vh, 76px);
-  background: var(--seafoam);
+  /* Chessboard ground. Each conic tile draws a 2x2 block, so the visible
+     square is half of --check-size. The two greens sit close together on
+     purpose — the pattern should read as texture behind the content, not
+     as a competing foreground element. */
+  --check-size: 160px;
+  background-color: var(--seafoam);
+  background-image: repeating-conic-gradient(
+    var(--seafoam-tint) 0% 25%,
+    var(--seafoam) 0% 50%
+  );
+  background-size: var(--check-size) var(--check-size);
 }
 
 /* Media sits in the hero's left column so it is visible without scrolling.
@@ -198,11 +208,17 @@ select {
   color: rgba(20, 51, 92, 0.42);
 }
 
+/* White panel so the copy stays readable over the chessboard, carrying the
+   same offset shadow as the image frame beside it. */
 .hero-inner {
   position: relative;
   z-index: 2;
   display: grid;
   justify-items: start;
+  padding: clamp(24px, 2.8vw, 40px);
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 12px 14px 0 var(--navy);
 }
 
 .hero h1 {
@@ -217,9 +233,6 @@ select {
   letter-spacing: 0.012em;
   text-transform: uppercase;
   color: var(--navy);
-  /* Hard offset shadow, same language as the CTA and image frame, so the
-     headline lifts off the page rather than sitting flat on it. */
-  text-shadow: 4px 4px 0 rgba(36, 65, 94, 0.13);
 }
 
 .hero h1 em {
@@ -644,46 +657,24 @@ select {
   background: var(--pink);
 }
 
+/* The frame clips to animate its height between steps, and its height comes
+   from .step-content's scrollHeight. Buttons carry a 4px/5px offset shadow
+   that scrollHeight doesn't account for, so the last row's shadow was being
+   sliced off. Padding on .step-content is measured, so it buys vertical room;
+   the negative margin/padding pair widens the clip box without narrowing the
+   fields inside it. */
 .step-frame {
   overflow: hidden;
+  margin-inline: -8px;
+  padding-inline: 8px;
   transition: height 280ms ease;
 }
 
 .step-content {
   display: grid;
   gap: 26px;
+  padding-bottom: 8px;
   animation: stepContentEnter 220ms ease both;
-}
-
-.estimate-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--seafoam);
-  border: 1px solid rgba(7, 29, 61, 0.16);
-}
-
-.estimate-icon {
-  display: grid;
-  flex-shrink: 0;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: var(--navy);
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.estimate-note p {
-  margin: 0;
-  color: var(--navy);
-  font-size: 0.88rem;
-  font-weight: 500;
-  line-height: 1.45;
 }
 
 .form-status {
@@ -777,6 +768,22 @@ label {
   color: var(--seafoam-tint);
 }
 
+/* These are options, not primary actions: a pink hover followed by a navy
+   selected state read as two unrelated colours for one interaction. Hover
+   just firms up the navy the selected state uses. */
+.quote-card .segmented-control button:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: var(--navy);
+  color: var(--navy);
+  transform: none;
+  box-shadow: none;
+}
+
+.quote-card .segmented-control button.is-selected:hover:not(:disabled) {
+  background: var(--navy);
+  color: var(--seafoam-tint);
+}
+
 input,
 select,
 textarea {
@@ -824,7 +831,6 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--pink-deep);
-  box-shadow: 0 0 0 3px rgba(255, 111, 145, 0.35);
 }
 
 .button-row {
@@ -880,8 +886,15 @@ textarea:focus {
 }
 
 :focus-visible {
-  outline: 3px solid var(--pink-deep);
-  outline-offset: 3px;
+  outline: 2px solid var(--pink-deep);
+  outline-offset: 2px;
+}
+
+/* Inside the form the ring is drawn *inside* the control's own box. The step
+   frame is overflow:hidden to animate its height, and the fields run its full
+   width, so any ring sitting outside the box gets clipped at the edges. */
+.quote-card :focus-visible {
+  outline-offset: -2px;
 }
 
 @keyframes quoteEnter {
