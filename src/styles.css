@@ -71,30 +71,24 @@ select {
 
 /* ---------- top nav ---------- */
 
-/* Links left, brand centred, CTA right. The centre column is `auto` so the
-   brand sits at the true centre of the bar regardless of link width. */
+/* Brand left; section links and the quote button pushed right. */
 .site-nav {
   position: sticky;
   top: 0;
   z-index: 50;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
-  gap: 20px;
+  gap: clamp(18px, 2.4vw, 34px);
   padding: 12px clamp(18px, 5vw, 60px);
   background: var(--navy);
   color: var(--seafoam-tint);
-}
-
-.nav-links--right {
-  justify-self: end;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  justify-self: center;
+  margin-right: auto;
   text-decoration: none;
 }
 
@@ -171,6 +165,27 @@ select {
 .nav-links a:hover::after,
 .nav-links a:focus-visible::after {
   transform: scaleX(1);
+}
+
+/* A small cousin of .quote-button. Kept under 44px tall so the bar still
+   matches --nav-h. */
+.nav-quote {
+  flex: none;
+  padding: 9px 18px;
+  border: 2px solid var(--navy);
+  border-radius: 999px;
+  background: var(--sea-green);
+  color: var(--navy);
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.nav-quote:hover,
+.nav-quote:focus-visible {
+  background: var(--sea-green-light);
 }
 
 /* ---------- hero ---------- */
@@ -514,47 +529,31 @@ select {
 
 /* ---------- faq ---------- */
 
+/* Follows the about section on the same ground, so a rule separates them.
+   Heading left, questions right; stacks below 940px. */
 .faq {
-  padding: clamp(36px, 6vh, 64px) clamp(18px, 5vw, 60px) clamp(56px, 9vh, 104px);
+  padding: 0 clamp(18px, 5vw, 60px) clamp(56px, 9vh, 104px);
   background: var(--seafoam);
 }
 
 .faq-inner {
-  max-width: 760px;
+  max-width: 1040px;
   margin: 0 auto;
+  padding-top: clamp(48px, 8vh, 88px);
+  border-top: 1px solid rgba(20, 51, 92, 0.18);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: start;
 }
 
-/* Deliberately oversized — it's the main way off this page. */
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35em;
+.faq h2 {
+  margin: 0;
   font-family: var(--display);
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 700;
+  font-size: clamp(2rem, 4.4vw, 3.3rem);
+  font-weight: 500;
+  line-height: 1.06;
   letter-spacing: -0.02em;
-  color: var(--navy);
-  text-decoration: none;
-  transition: color 160ms ease;
-}
-
-.back-link span {
-  transition: transform 160ms ease;
-}
-
-.back-link:hover {
-  color: var(--sea-green-deep);
-}
-
-.back-link:hover span {
-  transform: translateX(-6px);
-}
-
-.faq h1 {
-  margin: clamp(28px, 5vh, 48px) 0 8px;
-  font-family: var(--display);
-  font-size: clamp(1.5rem, 2.6vw, 1.9rem);
-  font-weight: 600;
   color: var(--navy);
 }
 
@@ -565,6 +564,10 @@ select {
 .faq-item {
   padding: 22px 0;
   border-bottom: 1px solid rgba(20, 51, 92, 0.18);
+}
+
+.faq-item:first-child {
+  padding-top: 0;
 }
 
 .faq-item:last-child {
@@ -606,6 +609,41 @@ select {
   line-height: 1.06;
   letter-spacing: -0.02em;
   color: var(--navy);
+}
+
+/* Heading and lede on the left, the Dolphin Bay photo on the right. */
+.about-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+}
+
+/* Shown uncropped at the photo's own 16:9. The caption sits on the image,
+   styled like the hero's. */
+.about-photo {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 12px 14px 0 var(--navy);
+}
+
+.about-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.about-photo figcaption {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(20, 51, 92, 0.72);
+  color: #f8f4ea;
+  font-size: 0.82rem;
 }
 
 .about-lede {
@@ -654,6 +692,16 @@ select {
 .reviews-inner {
   max-width: 1040px;
   margin: 0 auto;
+}
+
+.reviews h2 {
+  margin: 0 0 clamp(28px, 5vh, 44px);
+  font-family: var(--display);
+  font-size: clamp(2rem, 4.4vw, 3.3rem);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--navy);
 }
 
 .reviews-grid {
@@ -1222,6 +1270,11 @@ textarea:focus {
     justify-self: end;
   }
 
+  .faq-inner,
+  .about-intro {
+    grid-template-columns: 1fr;
+  }
+
   .reviews-grid {
     grid-template-columns: 1fr;
   }
@@ -1240,25 +1293,19 @@ textarea:focus {
   }
 }
 
-/* Three columns won't fit — stack to a centred brand with the links and CTA
-   on a second row. The hero is already content-sized below 940px, so the
-   taller bar doesn't affect --nav-h. */
+/* The links won't fit beside the brand — brand and quote button share the
+   top row, links drop to a second. The hero is already content-sized below
+   940px, so the taller bar doesn't affect --nav-h. */
 @media (max-width: 800px) {
   .site-nav {
-    display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 10px 18px;
   }
 
   .nav-links {
     order: 2;
-  }
-
-  .brand {
-    order: 1;
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
   }
 }
 
@@ -1272,7 +1319,16 @@ textarea:focus {
   }
 
   .nav-links {
-    gap: 18px;
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 0.95rem;
+  }
+
+  .nav-quote {
+    padding: 7px 14px;
+    font-size: 0.92rem;
   }
 
   .quote-button {

@@ -7,6 +7,7 @@ import {
   type FormEvent,
 } from "react";
 import logoMarkUrl from "./assets/logo-mark.png";
+import dolphinBayUrl from "./assets/dolphin-bay-thailand.webp";
 import houseFrontUrl from "./assets/carousel/house-front.jpg";
 import frenchDoorsUrl from "./assets/carousel/french-doors.jpg";
 import poleCleaningUrl from "./assets/carousel/pole-cleaning.jpg";
@@ -711,81 +712,10 @@ function QuoteForm() {
   );
 }
 
-// Minimal history-API router. The site is three pages, so this is cheaper than
-// pulling in a routing library; Cloudflare already serves the SPA fallback for
-// deep links (see wrangler.jsonc `not_found_handling`).
-function usePath() {
-  const [path, setPath] = useState(() => window.location.pathname);
-
-  useEffect(() => {
-    const onPop = () => setPath(window.location.pathname);
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, []);
-
-  const navigate = (next: string) => {
-    if (next !== window.location.pathname) {
-      window.history.pushState({}, "", next);
-      setPath(next);
-    }
-    window.scrollTo(0, 0);
-  };
-
-  return { path, navigate };
-}
-
-function PageLink({
-  to,
-  navigate,
-  className,
-  children,
-}: {
-  to: string;
-  navigate: (path: string) => void;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <a
-      href={to}
-      className={className}
-      onClick={(event) => {
-        // Let the browser handle modified clicks (new tab, download, etc.).
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-          return;
-        }
-        event.preventDefault();
-        navigate(to);
-      }}
-    >
-      {children}
-    </a>
-  );
-}
-
-function SiteNav({ navigate }: { navigate: (path: string) => void }) {
+function SiteNav({ onQuote }: { onQuote: () => void }) {
   return (
     <nav className="site-nav" aria-label="Main">
-      <div className="nav-links">
-        <SectionLink id="about" navigate={navigate}>
-          Who We Are
-        </SectionLink>
-        <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
-          Reviews
-        </a>
-      </div>
-
-      <a
-        className="brand"
-        href="/"
-        onClick={(event) => {
-          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-            return;
-          }
-          event.preventDefault();
-          navigate("/");
-        }}
-      >
+      <a className="brand" href="#top">
         <span className="brand-mark" aria-hidden="true">
           <img src={logoMarkUrl} alt="" />
         </span>
@@ -795,12 +725,16 @@ function SiteNav({ navigate }: { navigate: (path: string) => void }) {
         </span>
       </a>
 
-      <div className="nav-links nav-links--right">
-        <PageLink to="/faq" navigate={navigate}>
-          FAQ
-        </PageLink>
+      <div className="nav-links">
+        <a href="#reviews">Reviews</a>
+        <a href="#about">Who We Are</a>
+        <a href="#faq">FAQ</a>
         <a href="#contact">Contact</a>
       </div>
+
+      <button type="button" className="nav-quote" onClick={onQuote}>
+        Get a quote
+      </button>
     </nav>
   );
 }
@@ -813,10 +747,6 @@ const FAQS: { q: string; a: string }[] = [
   {
     q: "Do you do commercial work?",
     a: "Yes. We clean offices and storefronts too, and we can come before you open or after you close so we're not in anyone's way.",
-  },
-  {
-    q: "Are you licensed and insured?",
-    a: "Yes, both.",
   },
   {
     q: "Is your cleaning system safe for my plants and pets?",
@@ -832,15 +762,11 @@ const FAQS: { q: string; a: string }[] = [
   },
 ];
 
-function FaqPage({ navigate }: { navigate: (path: string) => void }) {
+function Faq() {
   return (
-    <section className="faq">
+    <section id="faq" className="faq" aria-label="Frequently asked questions">
       <div className="faq-inner">
-        <PageLink to="/" navigate={navigate} className="back-link">
-          <span aria-hidden="true">←</span> Back to home
-        </PageLink>
-
-        <h1>Frequently asked questions</h1>
+        <h2>Frequently asked questions</h2>
 
         <dl className="faq-list">
           {FAQS.map(({ q, a }) => (
@@ -852,38 +778,6 @@ function FaqPage({ navigate }: { navigate: (path: string) => void }) {
         </dl>
       </div>
     </section>
-  );
-}
-
-// Links to a section of the home page. From another page it switches to home
-// first, then scrolls once the section has rendered.
-function SectionLink({
-  id,
-  navigate,
-  children,
-}: {
-  id: string;
-  navigate: (path: string) => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <a
-      href={`/#${id}`}
-      onClick={(event) => {
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-          return;
-        }
-        event.preventDefault();
-        if (window.location.pathname !== "/") {
-          navigate("/");
-        }
-        requestAnimationFrame(() => {
-          document.getElementById(id)?.scrollIntoView();
-        });
-      }}
-    >
-      {children}
-    </a>
   );
 }
 
@@ -1124,6 +1018,7 @@ function Reviews() {
   return (
     <section id="reviews" className="reviews" aria-label="Customer reviews">
       <div className="reviews-inner">
+        <h2>What our clients say about us</h2>
         <div className="reviews-grid">
           {REVIEWS.map(({ name, text }) => (
             <figure key={name} className="review-card">
@@ -1148,14 +1043,27 @@ function About() {
   return (
     <section id="about" className="about" aria-label="About Dolphin Bay Window Cleaning">
       <div className="about-inner">
-        <h2>Who We Are</h2>
-        <p className="about-lede">
-          We're Ian and Oliver. We started Dolphin Bay because we were tired
-          of contractors who show up late, or not at all, and call that good
-          enough. You should know the people working on your home or business,
-          and you should be able to count on them. When we say we'll be there,
-          we're there. And our cleaning is excellent every time.
-        </p>
+        <div className="about-intro">
+          <div>
+            <h2>Who We Are</h2>
+            <p className="about-lede">
+              We're Ian and Oliver. We started Dolphin Bay because we were tired
+              of contractors who show up late, or not at all, and call that good
+              enough. You should know the people working on your home or business,
+              and you should be able to count on them. When we say we'll be there,
+              we're there. And our cleaning is excellent every time.
+            </p>
+          </div>
+
+          <figure className="about-photo">
+            <img
+              src={dolphinBayUrl}
+              alt="A painted Thai fishing boat pulled up on the beach at Dolphin Bay at dusk"
+              loading="lazy"
+            />
+            <figcaption>Dolphin Bay, Thailand: the bay we're named after.</figcaption>
+          </figure>
+        </div>
 
         <div className="about-grid">
           <div className="about-point">
@@ -1210,7 +1118,8 @@ function Contact({ onQuote }: { onQuote: () => void }) {
         <footer className="site-footer">
           <p>© {new Date().getFullYear()} Dolphin Bay Window Cleaning</p>
           <p>Serving the greater Pensacola area</p>
-          {/* The hero background is CC BY 4.0, which requires this credit. */}
+          {/* Both photos are Creative Commons licensed and require these
+              credits. */}
           <p className="footer-credit">
             Background photo:{" "}
             <a
@@ -1227,6 +1136,22 @@ function Contact({ onQuote }: { onQuote: () => void }) {
               rel="noopener noreferrer"
             >
               CC BY 4.0
+            </a>
+            . Dolphin Bay photo:{" "}
+            <a
+              href="https://commons.wikimedia.org/wiki/File:Dolphin_Bay_Thailand_(12211183056).jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Clay Gilliland
+            </a>
+            ,{" "}
+            <a
+              href="https://creativecommons.org/licenses/by-sa/2.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              CC BY-SA 2.0
             </a>
           </p>
         </footer>
@@ -1281,22 +1206,14 @@ export default function App() {
   const [quoteOpen, setQuoteOpen] = useState(false);
   const openQuote = () => setQuoteOpen(true);
   const closeQuote = () => setQuoteOpen(false);
-  const { path, navigate } = usePath();
 
   return (
     <>
-      <SiteNav navigate={navigate} />
-
-      {path === "/faq" ? (
-        <FaqPage navigate={navigate} />
-      ) : (
-        <>
-          <Hero onQuote={openQuote} />
-          <Reviews />
-          <About />
-        </>
-      )}
-
+      <SiteNav onQuote={openQuote} />
+      <Hero onQuote={openQuote} />
+      <Reviews />
+      <About />
+      <Faq />
       <Contact onQuote={openQuote} />
       <QuoteDialog open={quoteOpen} onClose={closeQuote} />
     </>
