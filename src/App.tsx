@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   type AnimationEvent,
+  type CSSProperties,
   type FormEvent,
 } from "react";
 import logoMarkUrl from "./assets/logo-mark.png";
@@ -762,15 +763,39 @@ const FAQS: { q: string; a: string }[] = [
   },
 ];
 
+// Staggers siblings in a grid; read by the [data-reveal] transition-delay.
+function revealIndex(i: number) {
+  return { "--reveal-i": i } as CSSProperties;
+}
+
+// Fades each [data-reveal] element in the first time it scrolls into view.
+function useReveal() {
+  useEffect(() => {
+    const targets = document.querySelectorAll("[data-reveal]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px" },
+    );
+    targets.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+}
+
 function Faq() {
   return (
-    <section id="faq" className="faq" aria-label="Frequently asked questions">
-      <div className="faq-inner">
-        <h2>Frequently asked questions</h2>
+    <section id="faq" className="section faq" aria-label="Frequently asked questions">
+      <div className="section-inner">
+        <h2 className="section-title" data-reveal>Frequently asked questions</h2>
 
         <dl className="faq-list">
-          {FAQS.map(({ q, a }) => (
-            <div key={q} className="faq-item">
+          {FAQS.map(({ q, a }, i) => (
+            <div key={q} className="faq-item" data-reveal style={revealIndex(i % 3)}>
               <dt>{q}</dt>
               <dd>{a}</dd>
             </div>
@@ -1014,12 +1039,12 @@ const REVIEWS: { name: string; text: string }[] = [
 
 function Reviews() {
   return (
-    <section id="reviews" className="reviews" aria-label="Customer reviews">
-      <div className="reviews-inner">
-        <h2>What our clients say about us</h2>
+    <section id="reviews" className="section reviews" aria-label="Customer reviews">
+      <div className="section-inner">
+        <h2 className="section-title" data-reveal>What our clients say about us</h2>
         <div className="reviews-grid">
-          {REVIEWS.map(({ name, text }) => (
-            <figure key={name} className="review-card">
+          {REVIEWS.map(({ name, text }, i) => (
+            <figure key={name} className="review-card" data-reveal style={revealIndex(i)}>
               <span className="review-stars" aria-label="5 out of 5 stars">
                 <StarRow />
               </span>
@@ -1039,11 +1064,11 @@ function Reviews() {
 
 function About() {
   return (
-    <section id="about" className="about" aria-label="About Dolphin Bay Window Cleaning">
-      <div className="about-inner">
+    <section id="about" className="section about" aria-label="About Dolphin Bay Window Cleaning">
+      <div className="section-inner">
         <div className="about-intro">
-          <div>
-            <h2>Who We Are</h2>
+          <div data-reveal>
+            <h2 className="section-title">Who We Are</h2>
             <p className="about-lede">
               We're Ian and Oliver. We started Dolphin Bay because we were tired
               of contractors who show up late, or not at all, and call that good
@@ -1053,7 +1078,7 @@ function About() {
             </p>
           </div>
 
-          <figure className="about-photo">
+          <figure className="about-photo" data-reveal style={revealIndex(1)}>
             <img
               src={dolphinBayUrl}
               alt="A painted Thai fishing boat pulled up on the beach at Dolphin Bay at dusk"
@@ -1064,21 +1089,21 @@ function About() {
         </div>
 
         <div className="about-grid">
-          <div className="about-point">
+          <div className="about-point" data-reveal style={revealIndex(0)}>
             <h3>Pure water</h3>
             <p>
               We clean with deionized water. With the minerals filtered out,
               there's nothing left behind to spot, so your glass dries clear.
             </p>
           </div>
-          <div className="about-point">
+          <div className="about-point" data-reveal style={revealIndex(1)}>
             <h3>Commercial and residential</h3>
             <p>
               Single-story and two-story homes, offices, and retail spaces — we
               quote exterior-only or full inside-and-out cleans either way.
             </p>
           </div>
-          <div className="about-point">
+          <div className="about-point" data-reveal style={revealIndex(2)}>
             <h3>Licensed and insured</h3>
             <p>
               We're local, not a franchise call center. You talk to the
@@ -1103,10 +1128,10 @@ function Contact({ onQuote }: { onQuote: () => void }) {
             </a>
             <a
               className="contact-email"
-              href="mailto:hello@dolphinbaywindowcleaning.com"
+              href="mailto:dolphinbaywindowcleaning@gmail.com"
             >
               <MailIcon />
-              hello@dolphinbaywindowcleaning.com
+              dolphinbaywindowcleaning@gmail.com
             </a>
           </div>
 
@@ -1188,14 +1213,17 @@ export default function App() {
   const [quoteOpen, setQuoteOpen] = useState(false);
   const openQuote = () => setQuoteOpen(true);
   const closeQuote = () => setQuoteOpen(false);
+  useReveal();
 
   return (
     <>
       <SiteNav onQuote={openQuote} />
       <Hero onQuote={openQuote} />
-      <Reviews />
-      <About />
-      <Faq />
+      <main>
+        <Reviews />
+        <About />
+        <Faq />
+      </main>
       <Contact onQuote={openQuote} />
       <QuoteDialog open={quoteOpen} onClose={closeQuote} />
     </>
