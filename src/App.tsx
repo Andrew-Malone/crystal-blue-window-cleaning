@@ -6,7 +6,11 @@ import {
   type AnimationEvent,
   type FormEvent,
 } from "react";
-import logoMarkUrl from "./assets/dolphin-bay-mark.svg";
+import logoMarkUrl from "./assets/logo-mark.png";
+import houseFrontUrl from "./assets/carousel/house-front.jpg";
+import frenchDoorsUrl from "./assets/carousel/french-doors.jpg";
+import poleCleaningUrl from "./assets/carousel/pole-cleaning.jpg";
+import brickPorchUrl from "./assets/carousel/brick-porch.jpg";
 
 type Pt = { x: number; y: number };
 
@@ -733,15 +737,18 @@ function usePath() {
 function PageLink({
   to,
   navigate,
+  className,
   children,
 }: {
   to: string;
   navigate: (path: string) => void;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
     <a
       href={to}
+      className={className}
       onClick={(event) => {
         // Let the browser handle modified clicks (new tab, download, etc.).
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
@@ -779,7 +786,9 @@ function SiteNav({ navigate }: { navigate: (path: string) => void }) {
           navigate("/");
         }}
       >
-        <img className="brand-mark" src={logoMarkUrl} alt="" aria-hidden="true" />
+        <span className="brand-mark" aria-hidden="true">
+          <img src={logoMarkUrl} alt="" />
+        </span>
         <span className="brand-name">
           <b>Dolphin Bay</b>
           <span>Window Cleaning</span>
@@ -793,6 +802,56 @@ function SiteNav({ navigate }: { navigate: (path: string) => void }) {
         <a href="#contact">Contact</a>
       </div>
     </nav>
+  );
+}
+
+const FAQS: { q: string; a: string }[] = [
+  {
+    q: "What areas do you serve?",
+    a: "The greater Pensacola area. If you're not sure whether you're in range, give us a call and we'll let you know.",
+  },
+  {
+    q: "Do you do commercial work?",
+    a: "Yes. We clean offices and storefronts too, and we can come before you open or after you close so we're not in anyone's way.",
+  },
+  {
+    q: "Are you licensed and insured?",
+    a: "Yes, both.",
+  },
+  {
+    q: "Is your cleaning system safe for my plants and pets?",
+    a: "Yes. We clean with purified, deionized water, so there's nothing in the runoff that will hurt your yard or your animals.",
+  },
+  {
+    q: "Can you reach second-story windows?",
+    a: "Yes. Our water-fed pole reaches 40 feet, which covers second-story windows with room to spare.",
+  },
+  {
+    q: "How often should I have my windows cleaned?",
+    a: "For most homes, about every six months.",
+  },
+];
+
+function FaqPage({ navigate }: { navigate: (path: string) => void }) {
+  return (
+    <section className="faq">
+      <div className="faq-inner">
+        <PageLink to="/" navigate={navigate} className="back-link">
+          <span aria-hidden="true">←</span> Back to home
+        </PageLink>
+
+        <h1>Frequently asked questions</h1>
+
+        <dl className="faq-list">
+          {FAQS.map(({ q, a }) => (
+            <div key={q} className="faq-item">
+              <dt>{q}</dt>
+              <dd>{a}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
   );
 }
 
@@ -811,6 +870,8 @@ function PlaceholderPage({ title, blurb }: { title: string; blurb: string }) {
 
 // TODO: replace with the real Google Business review link before launch.
 const GOOGLE_REVIEWS_URL = "https://search.google.com/local/reviews?placeid=REPLACE_ME";
+// TODO: replace with the real Facebook page link before launch.
+const FACEBOOK_URL = "https://www.facebook.com/REPLACE_ME";
 
 function StarRow() {
   return (
@@ -821,6 +882,14 @@ function StarRow() {
         </svg>
       ))}
     </span>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z" />
+    </svg>
   );
 }
 
@@ -857,7 +926,7 @@ function ArrowIcon() {
 function QuoteButton({ onQuote }: { onQuote: () => void }) {
   return (
     <button type="button" className="quote-button" onClick={onQuote}>
-      <span>Get Quote</span>
+      <span>Get quote</span>
       <span className="quote-button-icon" aria-hidden="true">
         <ArrowIcon />
       </span>
@@ -865,14 +934,111 @@ function QuoteButton({ onQuote }: { onQuote: () => void }) {
   );
 }
 
+// Each slide is one or more photos. Portrait shots go in pairs so they sit
+// side by side and fill the landscape frame instead of letterboxing.
+const HERO_SLIDES: { src: string; alt: string }[][] = [
+  [{ src: houseFrontUrl, alt: "Front of a two-story home with sparkling dormer and porch windows" }],
+  [
+    { src: frenchDoorsUrl, alt: "Cleaning French doors with a water-fed pole" },
+    { src: poleCleaningUrl, alt: "Cleaning second-story windows with a water-fed pole" },
+  ],
+  [{ src: brickPorchUrl, alt: "Clean French doors and windows along a brick porch" }],
+];
+
+const SLIDE_INTERVAL_MS = 6000;
+
+function ChevronIcon({ dir }: { dir: "prev" | "next" }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={dir === "prev" ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7"} />
+    </svg>
+  );
+}
+
+function HeroCarousel() {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = HERO_SLIDES.length;
+  const go = (next: number) => setIndex((next + count) % count);
+
+  // Auto-advance, unless the visitor is interacting with it or has asked
+  // for reduced motion. Re-keyed on index so a manual change resets the timer.
+  useEffect(() => {
+    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+    const id = window.setTimeout(() => setIndex((i) => (i + 1) % count), SLIDE_INTERVAL_MS);
+    return () => window.clearTimeout(id);
+  }, [index, paused, count]);
+
+  return (
+    <section
+      className="hero-media hero-carousel"
+      aria-roledescription="carousel"
+      aria-label="Recent work"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+    >
+      {HERO_SLIDES.map((photos, i) => (
+        <div
+          key={i}
+          className={`carousel-slide${i === index ? " is-active" : ""}`}
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`${i + 1} of ${count}`}
+          aria-hidden={i !== index}
+          style={{ gridTemplateColumns: `repeat(${photos.length}, minmax(0, 1fr))` }}
+        >
+          {photos.map((photo) => (
+            <img
+              key={photo.src}
+              src={photo.src}
+              alt={photo.alt}
+              loading={i === 0 ? "eager" : "lazy"}
+            />
+          ))}
+        </div>
+      ))}
+
+      <button
+        type="button"
+        className="carousel-arrow carousel-arrow--prev"
+        aria-label="Previous photo"
+        onClick={() => go(index - 1)}
+      >
+        <ChevronIcon dir="prev" />
+      </button>
+      <button
+        type="button"
+        className="carousel-arrow carousel-arrow--next"
+        aria-label="Next photo"
+        onClick={() => go(index + 1)}
+      >
+        <ChevronIcon dir="next" />
+      </button>
+
+      <div className="carousel-dots">
+        {HERO_SLIDES.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            className={i === index ? "is-active" : undefined}
+            aria-label={`Show photo ${i + 1}`}
+            aria-current={i === index}
+            onClick={() => go(i)}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Hero({ onQuote }: { onQuote: () => void }) {
   return (
     <header id="top" className="hero">
-      {/* Placeholder until real photography lands — swap this div's contents
-          for an <img>/<video> and the frame around it stays as-is. */}
-      <div className="hero-media" role="img" aria-label="Photo placeholder">
-        <span className="hero-media-label">Image placeholder</span>
-      </div>
+      <HeroCarousel />
 
       <div className="hero-inner">
         <h1>
@@ -885,16 +1051,27 @@ function Hero({ onQuote }: { onQuote: () => void }) {
           treat every customer with the respect you deserve.
         </p>
 
-        <a
-          className="hero-rating"
-          href={GOOGLE_REVIEWS_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <StarRow />
-          <b aria-label="Rated 5 out of 5 stars">5.0</b>
-          <span className="rating-label">Read our Google reviews</span>
-        </a>
+        <div className="hero-social">
+          <a
+            className="hero-rating"
+            href={GOOGLE_REVIEWS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <StarRow />
+            <b aria-label="Rated 5 out of 5 stars">5.0</b>
+            <span className="rating-label">Read our Google reviews</span>
+          </a>
+          <a
+            className="hero-facebook"
+            href={FACEBOOK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Dolphin Bay Window Cleaning on Facebook"
+          >
+            <FacebookIcon />
+          </a>
+        </div>
 
         <QuoteButton onQuote={onQuote} />
       </div>
@@ -913,10 +1090,10 @@ function About() {
 
         <div className="about-grid">
           <div className="about-point">
-            <h3>Purified water, no streaks</h3>
+            <h3>Pure water</h3>
             <p>
-              We use a purified-water system, so glass dries clear on its own
-              without wiping down spots or film afterward.
+              We clean with deionized water. With the minerals filtered out,
+              there's nothing left behind to spot, so your glass dries clear.
             </p>
           </div>
           <div className="about-point">
@@ -945,9 +1122,9 @@ function Contact({ onQuote }: { onQuote: () => void }) {
       <div className="contact-inner">
         <div className="contact-main">
           <div className="contact-details">
-            <a className="contact-phone" href="tel:+18505550134">
+            <a className="contact-phone" href="tel:+18503902894">
               <PhoneIcon />
-              (850) 555-0134
+              (850) 390-2894
             </a>
             <a
               className="contact-email"
@@ -1028,10 +1205,7 @@ export default function App() {
           blurb="This page is a placeholder — the full story is still being written."
         />
       ) : path === "/faq" ? (
-        <PlaceholderPage
-          title="FAQ"
-          blurb="This page is a placeholder — answers to the questions we get asked most are on the way."
-        />
+        <FaqPage navigate={navigate} />
       ) : (
         <>
           <Hero onQuote={openQuote} />

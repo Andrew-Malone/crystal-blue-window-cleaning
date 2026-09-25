@@ -15,9 +15,9 @@
      --seafoam-tint, which is a text colour. */
   --check-a: #e8f1e7;
   --check-b: #cbe0cf;
-  --pink: #ff8494;
-  --pink-light: #ffa0ac;
-  --pink-deep: #d9536a;
+  --sea-green: #3cc48e;
+  --sea-green-light: #6dd8ad;
+  --sea-green-deep: #17754f;
   --gold: #f0b429;
   /* Height of the sticky nav, subtracted from the hero so the hero fills the
      first screen exactly and the next section starts below the fold. Must
@@ -93,11 +93,22 @@ select {
   text-decoration: none;
 }
 
+/* The logo is navy with a see-through belly, so it would vanish on the navy
+   bar — it sits on a cream badge instead. Height stays 44px to match
+   --nav-h. */
 .brand-mark {
-  width: 44px;
-  height: 44px;
   display: block;
+  padding: 5px 9px;
   flex: none;
+  border-radius: 10px;
+  background: #f8f4ea;
+}
+
+/* 34px image + 2 x 5px padding = the 44px badge. */
+.brand-mark img {
+  display: block;
+  height: 34px;
+  width: auto;
 }
 
 .brand-name {
@@ -146,7 +157,7 @@ select {
   bottom: 0;
   height: 2px;
   border-radius: 2px;
-  background: var(--pink);
+  background: var(--sea-green);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 220ms ease;
@@ -200,12 +211,106 @@ select {
   object-fit: cover;
 }
 
-.hero-media-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(20, 51, 92, 0.42);
+/* Slides stack in one grid cell and crossfade. A slide with two portrait
+   photos splits into columns (set inline) with a navy seam between them. */
+.hero-carousel {
+  place-items: stretch;
+}
+
+.carousel-slide {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: 4px;
+  min-height: 0;
+  background: var(--navy);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 700ms ease,
+    visibility 0s linear 700ms;
+}
+
+.carousel-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 700ms ease;
+}
+
+.carousel-slide img {
+  min-height: 0;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 2px solid var(--navy);
+  border-radius: 50%;
+  background: #f8f4ea;
+  color: var(--navy);
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--navy);
+  transform: translateY(-50%);
+  opacity: 0.88;
+  transition:
+    opacity 160ms ease,
+    background 160ms ease;
+}
+
+.carousel-arrow--prev {
+  left: 14px;
+}
+
+.carousel-arrow--next {
+  right: 14px;
+}
+
+.carousel-arrow:hover {
+  opacity: 1;
+  background: var(--sea-green-light);
+}
+
+.carousel-arrow svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(20, 51, 92, 0.55);
+  transform: translateX(-50%);
+}
+
+.carousel-dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(248, 244, 234, 0.55);
+  cursor: pointer;
+  transition: background 200ms ease;
+}
+
+.carousel-dots button.is-active {
+  background: var(--sea-green);
 }
 
 /* White panel so the copy stays readable over the chessboard, carrying the
@@ -240,7 +345,7 @@ select {
 .hero h1 em {
   display: block;
   font-style: normal;
-  color: var(--pink-deep);
+  color: var(--sea-green-deep);
 }
 
 .hero-sub {
@@ -251,13 +356,41 @@ select {
   color: var(--navy-soft);
 }
 
+/* Reviews link plus the Facebook icon, sharing one row. */
+.hero-social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: clamp(18px, 2.6vh, 26px) 0 clamp(24px, 3.6vh, 34px);
+}
+
 .hero-rating {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin: clamp(18px, 2.6vh, 26px) 0 clamp(24px, 3.6vh, 34px);
   text-decoration: none;
   color: var(--navy);
+}
+
+/* Navy to match the text beside it; a thin divider separates it from the
+   reviews link so it doesn't read as part of the rating. */
+.hero-facebook {
+  display: inline-flex;
+  padding-left: 16px;
+  border-left: 1px solid rgba(20, 51, 92, 0.25);
+  color: var(--navy);
+  transition: color 160ms ease;
+}
+
+.hero-facebook svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.hero-facebook:hover {
+  color: var(--sea-green-deep);
 }
 
 .stars {
@@ -304,7 +437,7 @@ select {
   padding: 14px 17px 14px 34px;
   border: 3px solid var(--navy);
   border-radius: 999px;
-  background: var(--pink);
+  background: var(--sea-green);
   color: var(--navy);
   font-family: var(--display);
   font-size: clamp(1.9rem, 4vw, 2.9rem);
@@ -320,7 +453,7 @@ select {
 
 .quote-button:hover,
 .quote-button:focus-visible {
-  background: var(--pink-light);
+  background: var(--sea-green-light);
   box-shadow: 4px 5px 0 var(--navy);
   transform: translate(5px, 5px);
 }
@@ -390,6 +523,79 @@ select {
   margin: 0;
   font-size: clamp(1rem, 1.4vw, 1.12rem);
   line-height: 1.65;
+  color: var(--navy-soft);
+}
+
+/* ---------- faq ---------- */
+
+.faq {
+  padding: clamp(36px, 6vh, 64px) clamp(18px, 5vw, 60px) clamp(56px, 9vh, 104px);
+  background: var(--seafoam);
+}
+
+.faq-inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* Deliberately oversized — it's the main way off this page. */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-family: var(--display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.back-link span {
+  transition: transform 160ms ease;
+}
+
+.back-link:hover {
+  color: var(--sea-green-deep);
+}
+
+.back-link:hover span {
+  transform: translateX(-6px);
+}
+
+.faq h1 {
+  margin: clamp(28px, 5vh, 48px) 0 8px;
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.faq-list {
+  margin: 0;
+}
+
+.faq-item {
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(20, 51, 92, 0.18);
+}
+
+.faq-item:last-child {
+  border-bottom: 0;
+}
+
+.faq-item dt {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.faq-item dd {
+  margin: 8px 0 0;
+  font-size: 1.02rem;
+  line-height: 1.6;
   color: var(--navy-soft);
 }
 
@@ -489,7 +695,7 @@ select {
   width: 21px;
   height: 21px;
   flex: none;
-  color: var(--pink);
+  color: var(--sea-green);
 }
 
 .contact-phone,
@@ -517,7 +723,7 @@ select {
 
 .contact-phone:hover,
 .contact-email:hover {
-  color: var(--pink);
+  color: var(--sea-green);
 }
 
 
@@ -656,7 +862,7 @@ select {
 }
 
 .step-track span.is-active {
-  background: var(--pink);
+  background: var(--sea-green);
 }
 
 /* The frame clips to animate its height between steps, and its height comes
@@ -752,7 +958,7 @@ label {
 }
 
 /* Scoped past `.quote-card button` below, which would otherwise paint every
-   unselected option pink. */
+   unselected option green. */
 .quote-card .segmented-control button {
   min-height: 48px;
   border: 1px solid rgba(7, 29, 61, 0.2);
@@ -770,7 +976,7 @@ label {
   color: var(--seafoam-tint);
 }
 
-/* These are options, not primary actions: a pink hover followed by a navy
+/* These are options, not primary actions: a green hover followed by a navy
    selected state read as two unrelated colours for one interaction. Hover
    just firms up the navy the selected state uses. */
 .quote-card .segmented-control button:hover:not(:disabled) {
@@ -832,7 +1038,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--pink-deep);
+  border-color: var(--sea-green-deep);
 }
 
 .button-row {
@@ -851,7 +1057,7 @@ textarea:focus {
   min-height: 52px;
   border: 2px solid var(--navy);
   border-radius: 10px;
-  background: var(--pink);
+  background: var(--sea-green);
   color: var(--navy);
   font-family: var(--display);
   font-size: 1.08rem;
@@ -865,7 +1071,7 @@ textarea:focus {
 }
 
 .quote-card button:hover:not(:disabled) {
-  background: var(--pink-light);
+  background: var(--sea-green-light);
   box-shadow: 2px 2px 0 var(--navy);
   transform: translate(2px, 3px);
 }
@@ -893,7 +1099,7 @@ textarea:focus {
 }
 
 :focus-visible {
-  outline: 2px solid var(--pink-deep);
+  outline: 2px solid var(--sea-green-deep);
   outline-offset: 2px;
 }
 
@@ -985,8 +1191,11 @@ textarea:focus {
 
 @media (max-width: 620px) {
   .brand-mark {
-    width: 38px;
-    height: 38px;
+    padding: 4px 8px;
+  }
+
+  .brand-mark img {
+    height: 30px;
   }
 
   .nav-links {
