@@ -767,9 +767,9 @@ function SiteNav({ navigate }: { navigate: (path: string) => void }) {
   return (
     <nav className="site-nav" aria-label="Main">
       <div className="nav-links">
-        <PageLink to="/about" navigate={navigate}>
+        <SectionLink id="about" navigate={navigate}>
           Who We Are
-        </PageLink>
+        </SectionLink>
         <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
           Reviews
         </a>
@@ -855,23 +855,42 @@ function FaqPage({ navigate }: { navigate: (path: string) => void }) {
   );
 }
 
-// Stub pages so the new nav destinations resolve. Replace the body copy with
-// real content when it's written.
-function PlaceholderPage({ title, blurb }: { title: string; blurb: string }) {
+// Links to a section of the home page. From another page it switches to home
+// first, then scrolls once the section has rendered.
+function SectionLink({
+  id,
+  navigate,
+  children,
+}: {
+  id: string;
+  navigate: (path: string) => void;
+  children: React.ReactNode;
+}) {
   return (
-    <section className="page-head">
-      <div className="page-head-inner">
-        <h1>{title}</h1>
-        <p>{blurb}</p>
-      </div>
-    </section>
+    <a
+      href={`/#${id}`}
+      onClick={(event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+        event.preventDefault();
+        if (window.location.pathname !== "/") {
+          navigate("/");
+        }
+        requestAnimationFrame(() => {
+          document.getElementById(id)?.scrollIntoView();
+        });
+      }}
+    >
+      {children}
+    </a>
   );
 }
 
-// TODO: replace with the real Google Business review link before launch.
-const GOOGLE_REVIEWS_URL = "https://search.google.com/local/reviews?placeid=REPLACE_ME";
-// TODO: replace with the real Facebook page link before launch.
-const FACEBOOK_URL = "https://www.facebook.com/REPLACE_ME";
+// Opens the Maps listing on its reviews tab (the !9m1!1b1 part of the data).
+const GOOGLE_REVIEWS_URL =
+  "https://www.google.com/maps/place/Gulf+Line+Window+Cleaning/@30.4851338,-87.2162395,11z/data=!4m8!3m7!1s0x826d2905b1efe7a1:0xdb37ca3cce2c7cd9!8m2!3d30.4849415!4d-87.0514285!9m1!1b1!16s%2Fg%2F11z8tnlj5r";
+const FACEBOOK_URL = "https://www.facebook.com/people/Dolphin-Bay-Window-Cleaning/61592673747370/";
 
 function StarRow() {
   return (
@@ -1076,9 +1095,52 @@ function Hero({ onQuote }: { onQuote: () => void }) {
         <QuoteButton onQuote={onQuote} />
       </div>
 
+      <p className="hero-caption">🇹🇭 The Gulf of Thailand, home of the original Dolphin Bay.</p>
+
       {/* On-load squeegee wipe, disabled for now. The component and its styles
           are intact — re-render <WindowWipe /> here to bring it back. */}
     </header>
+  );
+}
+
+// Copied from the Google listing, all five stars. Nancy's is excerpted (the
+// full text is on Google); keep the wording as written.
+const REVIEWS: { name: string; text: string }[] = [
+  {
+    name: "Reddoch Graphics",
+    text: "Ian and Oliver did a GREAT job on our exterior windows, screens, really thorough, really nice guys.",
+  },
+  {
+    name: "Nancy Brown",
+    text: "I wish there were more stars to give these guys! They were so professional, efficient, and my windows have never ever looked better! … Do not hesitate or think twice about hiring them!",
+  },
+  {
+    name: "Caron Majors",
+    text: "Ian and Oliver, the window guys…\nDo a great job; I tell you no lies.\nI now see my neighbors; my word you can trust.\nDon't dilly or dally; hire them you must!",
+  },
+];
+
+function Reviews() {
+  return (
+    <section id="reviews" className="reviews" aria-label="Customer reviews">
+      <div className="reviews-inner">
+        <div className="reviews-grid">
+          {REVIEWS.map(({ name, text }) => (
+            <figure key={name} className="review-card">
+              <span className="review-stars" aria-label="5 out of 5 stars">
+                <StarRow />
+              </span>
+              <blockquote>{text}</blockquote>
+              <figcaption>
+                <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
+                  {name}
+                </a>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -1086,7 +1148,14 @@ function About() {
   return (
     <section id="about" className="about" aria-label="About Dolphin Bay Window Cleaning">
       <div className="about-inner">
-        <h2>A local crew that treats your windows like our own.</h2>
+        <h2>Who We Are</h2>
+        <p className="about-lede">
+          We're Ian and Oliver. We started Dolphin Bay because we were tired
+          of contractors who show up late, or not at all, and call that good
+          enough. You should know the people working on your home or business,
+          and you should be able to count on them. When we say we'll be there,
+          we're there. And our cleaning is excellent every time.
+        </p>
 
         <div className="about-grid">
           <div className="about-point">
@@ -1141,6 +1210,25 @@ function Contact({ onQuote }: { onQuote: () => void }) {
         <footer className="site-footer">
           <p>© {new Date().getFullYear()} Dolphin Bay Window Cleaning</p>
           <p>Serving the greater Pensacola area</p>
+          {/* The hero background is CC BY 4.0, which requires this credit. */}
+          <p className="footer-credit">
+            Background photo:{" "}
+            <a
+              href="https://commons.wikimedia.org/wiki/File:Mu_Ko_Ang_Thong,_Panoramic_view,_Thailand.jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Vyacheslav Argenberg
+            </a>
+            ,{" "}
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              CC BY 4.0
+            </a>
+          </p>
         </footer>
       </div>
     </section>
@@ -1199,16 +1287,12 @@ export default function App() {
     <>
       <SiteNav navigate={navigate} />
 
-      {path === "/about" ? (
-        <PlaceholderPage
-          title="Who We Are"
-          blurb="This page is a placeholder — the full story is still being written."
-        />
-      ) : path === "/faq" ? (
+      {path === "/faq" ? (
         <FaqPage navigate={navigate} />
       ) : (
         <>
           <Hero onQuote={openQuote} />
+          <Reviews />
           <About />
         </>
       )}

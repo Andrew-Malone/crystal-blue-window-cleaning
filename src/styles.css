@@ -45,6 +45,11 @@ html {
   overscroll-behavior-y: none;
 }
 
+/* Keep in-page jumps from landing under the sticky nav. */
+section[id] {
+  scroll-margin-top: var(--nav-h);
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -180,10 +185,11 @@ select {
   min-height: calc(100vh - var(--nav-h));
   gap: clamp(30px, 4.5vw, 66px);
   padding: clamp(30px, 5vh, 60px) clamp(18px, 5vw, 60px) clamp(40px, 6vh, 76px);
-  /* Seascape ground. Vite resolves and fingerprints this url() at build time,
-     so the asset is hashed like any other import. */
+  /* Gulf of Thailand, home of the Dolphin Bay the business is named after.
+     Vite resolves and fingerprints this url() at build time, so the asset is
+     hashed like any other import. */
   background-color: var(--seafoam);
-  background-image: url("./assets/gulf-coast-vista.webp");
+  background-image: url("./assets/gulf-of-thailand.webp");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -311,6 +317,20 @@ select {
 
 .carousel-dots button.is-active {
   background: var(--sea-green);
+}
+
+/* Caption for the background photo, pinned to the hero's bottom edge. */
+.hero-caption {
+  position: absolute;
+  right: clamp(18px, 5vw, 60px);
+  bottom: 12px;
+  z-index: 2;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(20, 51, 92, 0.72);
+  color: #f8f4ea;
+  font-size: 0.82rem;
 }
 
 /* White panel so the copy stays readable over the chessboard, carrying the
@@ -492,40 +512,6 @@ select {
   display: none;
 }
 
-/* ---------- placeholder pages ---------- */
-
-.page-head {
-  display: grid;
-  align-content: center;
-  min-height: calc(64vh - var(--nav-h));
-  padding: clamp(56px, 10vh, 110px) clamp(18px, 5vw, 60px);
-  background: var(--seafoam);
-}
-
-.page-head-inner {
-  max-width: 1040px;
-  width: 100%;
-  margin: 0 auto;
-}
-
-.page-head h1 {
-  margin: 0 0 16px;
-  font-family: var(--display);
-  font-size: clamp(2.1rem, 4.6vw, 3.4rem);
-  font-weight: 600;
-  line-height: 1.06;
-  letter-spacing: -0.02em;
-  color: var(--navy);
-}
-
-.page-head p {
-  max-width: 52ch;
-  margin: 0;
-  font-size: clamp(1rem, 1.4vw, 1.12rem);
-  line-height: 1.65;
-  color: var(--navy-soft);
-}
-
 /* ---------- faq ---------- */
 
 .faq {
@@ -658,6 +644,73 @@ select {
   color: var(--navy-soft);
 }
 
+/* ---------- reviews ---------- */
+
+.reviews {
+  padding: clamp(44px, 7vh, 72px) clamp(18px, 5vw, 60px) 0;
+  background: var(--seafoam);
+}
+
+.reviews-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 2.4vw, 30px);
+}
+
+.review-card {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 26px 26px 22px;
+  border-radius: 16px;
+  background: #f8f4ea;
+  box-shadow: 6px 7px 0 var(--navy);
+}
+
+.review-stars {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.review-stars .stars {
+  gap: 3px;
+}
+
+.review-stars .stars svg {
+  width: 26px;
+  height: 26px;
+}
+
+.review-card blockquote {
+  flex: 1;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--navy-soft);
+  /* Keeps the line breaks in Caron's poem. */
+  white-space: pre-line;
+}
+
+/* Every card stretches to the same height, so the names line up across
+   the row. */
+.review-card figcaption {
+  margin-top: 22px;
+  font-family: var(--display);
+  font-weight: 600;
+  color: var(--navy);
+}
+
+/* Opens the Google reviews, but styled as plain text on purpose. */
+.review-card figcaption a {
+  color: inherit;
+  text-decoration: none;
+}
+
 /* ---------- contact + footer ---------- */
 
 .contact {
@@ -769,6 +822,15 @@ select {
 
 .site-footer p {
   margin: 0;
+}
+
+.footer-credit {
+  font-size: 0.74rem;
+  opacity: 0.8;
+}
+
+.footer-credit a {
+  color: inherit;
 }
 
 /* ---------- quote dialog ---------- */
@@ -1151,6 +1213,17 @@ textarea:focus {
   .hero-media {
     aspect-ratio: 16 / 10;
     box-shadow: 8px 9px 0 var(--navy);
+  }
+
+  /* Stacked, there's no spare space at the bottom edge — the caption joins
+     the flow under the photos instead of overlapping them. */
+  .hero-caption {
+    position: static;
+    justify-self: end;
+  }
+
+  .reviews-grid {
+    grid-template-columns: 1fr;
   }
 
   .about-grid {
