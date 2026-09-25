@@ -989,8 +989,6 @@ function Hero({ onQuote }: { onQuote: () => void }) {
         <QuoteButton onQuote={onQuote} />
       </div>
 
-      <p className="hero-caption">🇹🇭 The Gulf of Thailand, home of the original Dolphin Bay.</p>
-
       {/* On-load squeegee wipe, disabled for now. The component and its styles
           are intact — re-render <WindowWipe /> here to bring it back. */}
     </header>
@@ -1118,26 +1116,10 @@ function Contact({ onQuote }: { onQuote: () => void }) {
         <footer className="site-footer">
           <p>© {new Date().getFullYear()} Dolphin Bay Window Cleaning</p>
           <p>Serving the greater Pensacola area</p>
-          {/* Both photos are Creative Commons licensed and require these
-              credits. */}
+          {/* The Dolphin Bay photo is CC BY-SA 2.0, which requires this
+              credit. The hero background is CC0 and needs none. */}
           <p className="footer-credit">
-            Background photo:{" "}
-            <a
-              href="https://commons.wikimedia.org/wiki/File:Mu_Ko_Ang_Thong,_Panoramic_view,_Thailand.jpg"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Vyacheslav Argenberg
-            </a>
-            ,{" "}
-            <a
-              href="https://creativecommons.org/licenses/by/4.0/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              CC BY 4.0
-            </a>
-            . Dolphin Bay photo:{" "}
+            Dolphin Bay photo:{" "}
             <a
               href="https://commons.wikimedia.org/wiki/File:Dolphin_Bay_Thailand_(12211183056).jpg"
               target="_blank"

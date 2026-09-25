@@ -200,11 +200,14 @@ select {
   min-height: calc(100vh - var(--nav-h));
   gap: clamp(30px, 4.5vw, 66px);
   padding: clamp(30px, 5vh, 60px) clamp(18px, 5vw, 60px) clamp(40px, 6vh, 76px);
-  /* Gulf of Thailand, home of the Dolphin Bay the business is named after.
+  /* Pensacola Bay and the Bay Bridge (Skarz, CC0, no credit required).
      Vite resolves and fingerprints this url() at build time, so the asset is
-     hashed like any other import. */
+     hashed like any other import.
+     Alternate kept on hand: ./assets/navarre-beach-pier.webp (Taminar,
+     CC BY-SA 4.0). It needs a footer credit if it's swapped in:
+     https://commons.wikimedia.org/wiki/File:Navarre_Beach_Pier_IGP2095.jpg */
   background-color: var(--seafoam);
-  background-image: url("./assets/gulf-of-thailand.webp");
+  background-image: url("./assets/pensacola-bay.webp");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -332,20 +335,6 @@ select {
 
 .carousel-dots button.is-active {
   background: var(--sea-green);
-}
-
-/* Caption for the background photo, pinned to the hero's bottom edge. */
-.hero-caption {
-  position: absolute;
-  right: clamp(18px, 5vw, 60px);
-  bottom: 12px;
-  z-index: 2;
-  margin: 0;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: rgba(20, 51, 92, 0.72);
-  color: #f8f4ea;
-  font-size: 0.82rem;
 }
 
 /* White panel so the copy stays readable over the chessboard, carrying the
@@ -619,8 +608,7 @@ select {
   align-items: center;
 }
 
-/* Shown uncropped at the photo's own 16:9. The caption sits on the image,
-   styled like the hero's. */
+/* Shown uncropped at the photo's own 16:9. The caption sits on the image. */
 .about-photo {
   position: relative;
   margin: 0;
@@ -1261,13 +1249,6 @@ textarea:focus {
   .hero-media {
     aspect-ratio: 16 / 10;
     box-shadow: 8px 9px 0 var(--navy);
-  }
-
-  /* Stacked, there's no spare space at the bottom edge — the caption joins
-     the flow under the photos instead of overlapping them. */
-  .hero-caption {
-    position: static;
-    justify-self: end;
   }
 
   .faq-inner,
