@@ -1121,20 +1121,21 @@ select {
   gap: 16px;
 }
 
-label {
+label,
+.date-field {
   display: grid;
   gap: 8px;
   color: var(--navy-mid);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
 }
 
 .service-field {
   display: grid;
   gap: 8px;
   color: var(--navy-mid);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
 }
 
 .segmented-control {
@@ -1182,9 +1183,12 @@ input,
 select,
 textarea {
   width: 100%;
-  /* Override the inherited label font-size (0.8rem): anything under 16px
+  /* Override the inherited label font-size (0.88rem): anything under 16px
      makes mobile Safari/Chrome zoom the page in on focus. */
   font-size: 16px;
+  /* Labels wrap their fields, so without this the typed text inherits the
+     label's bold weight. */
+  font-weight: 400;
   border: 1px solid rgba(7, 29, 61, 0.2);
   border-radius: 10px;
   background: white;
@@ -1194,6 +1198,105 @@ textarea {
 
 input[type="date"] {
   position: relative;
+}
+
+/* ---------- desktop date picker (DateField) ---------- */
+
+/* Looks like the other inputs; opens the calendar popover. */
+.date-field-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  border: 1px solid rgba(7, 29, 61, 0.2);
+  border-radius: 10px;
+  background: white;
+  color: var(--navy);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+}
+
+.date-field-button:hover,
+.date-field-button[aria-expanded="true"] {
+  border-color: rgba(7, 29, 61, 0.45);
+}
+
+input::placeholder,
+textarea::placeholder,
+.date-field-placeholder {
+  color: rgba(7, 29, 61, 0.45);
+  /* Firefox dims placeholders with opacity on top of the colour. */
+  opacity: 1;
+}
+
+.date-field-button svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+/* A popover defaults to a centred, bordered box; DateField pins it under
+   (or over) the button with top/bottom/left. */
+.date-popover {
+  inset: auto;
+  margin: 0;
+  padding: 12px 14px;
+  border: 2px solid var(--navy);
+  border-radius: 14px;
+  background: var(--seafoam-tint);
+  color: var(--navy);
+  box-shadow: 6px 7px 0 var(--navy);
+  font-weight: 400;
+}
+
+.date-popover .rdp-root {
+  --rdp-accent-color: var(--sea-green-deep);
+  --rdp-accent-background-color: var(--seafoam);
+  --rdp-today-color: var(--sea-green-deep);
+  --rdp-day-height: 42px;
+  --rdp-day-width: 44px;
+  --rdp-day_button-height: 40px;
+  --rdp-day_button-width: 40px;
+  --rdp-disabled-opacity: 0.3;
+  font-family: var(--body);
+  font-size: 0.95rem;
+}
+
+.date-popover .rdp-month_caption {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.date-popover .rdp-chevron {
+  fill: var(--navy);
+}
+
+.date-popover .rdp-day_button:hover:not(:disabled) {
+  background: var(--seafoam);
+}
+
+.date-popover .rdp-selected .rdp-day_button {
+  border-color: var(--sea-green-deep);
+  background: var(--sea-green-deep);
+  color: white;
+  font-weight: 600;
+}
+
+/* Only Sunday is red — the week's one closed-looking day. */
+.date-popover .rdp-weekday:first-child,
+.date-popover .is-sunday:not(.rdp-selected) .rdp-day_button {
+  color: #c53030;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -1238,7 +1341,7 @@ textarea:focus {
   grid-template-columns: 1fr;
 }
 
-.quote-card button {
+.quote-card button:where(:not(.date-field *)) {
   position: relative;
   min-height: 52px;
   border: 2px solid var(--navy);
@@ -1256,7 +1359,7 @@ textarea:focus {
     background 160ms ease;
 }
 
-.quote-card button:hover:not(:disabled) {
+.quote-card button:where(:not(.date-field *)):hover:not(:disabled) {
   background: var(--sea-green-light);
   box-shadow: 2px 2px 0 var(--navy);
   transform: translate(2px, 3px);
@@ -1276,7 +1379,7 @@ textarea:focus {
   transform: none;
 }
 
-.quote-card button:disabled {
+.quote-card button:where(:not(.date-field *)):disabled {
   border-color: rgba(7, 29, 61, 0.25);
   background: rgba(7, 29, 61, 0.1);
   color: rgba(7, 29, 61, 0.42);

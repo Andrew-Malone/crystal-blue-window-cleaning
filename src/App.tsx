@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type FormEvent,
 } from "react";
+import { DateField } from "./DateField";
 import logoMarkUrl from "./assets/logo-mark.png";
 import dolphinBayUrl from "./assets/dolphin-bay-thailand.webp";
 import houseFrontUrl from "./assets/carousel/house-front.jpg";
@@ -657,21 +658,18 @@ function QuoteForm() {
                   onChange={(event) => updateField("streetAddress", event.target.value)}
                 />
               </label>
-              <label>
-                <span>When do you want the work done by?</span>
-                <input
-                  name="desiredDate"
-                  type="date"
-                  value={form.desiredDate}
-                  onChange={(event) => updateField("desiredDate", event.target.value)}
-                />
-              </label>
+              <DateField
+                label="When do you want the work done by?"
+                name="desiredDate"
+                value={form.desiredDate}
+                onChange={(value) => updateField("desiredDate", value)}
+              />
               <label>
                 <span>Anything else we should know? (optional)</span>
                 <textarea
                   name="details"
                   rows={3}
-                  placeholder="Gate codes, service details, problem windows, preferred timing..."
+                  placeholder="Gate code, pets, hard-to-reach windows, screens or tracks you'd like cleaned…"
                   value={form.details}
                   onChange={(event) => updateField("details", event.target.value)}
                 />
