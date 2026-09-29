@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dolphinbaywindows.com/sitemap.xml

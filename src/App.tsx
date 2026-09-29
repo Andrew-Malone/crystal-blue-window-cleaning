@@ -744,7 +744,7 @@ function SiteNav({ onQuote }: { onQuote: () => void }) {
 const FAQS: { q: string; a: string }[] = [
   {
     q: "What areas do you serve?",
-    a: "The greater Pensacola area. If you're not sure whether you're in range, give us a call and we'll let you know.",
+    a: "Pensacola, Gulf Breeze, Pace, Milton, Navarre and Perdido Key. If you're not sure whether you're in range, give us a call and we'll let you know.",
   },
   {
     q: "Do you do commercial work?",
@@ -977,6 +977,7 @@ function HeroCarousel() {
               src={photo.src}
               alt={photo.alt}
               loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : undefined}
               style={
                 photo.placeholder
                   ? { backgroundImage: `url(${photo.placeholder})` }
@@ -1159,6 +1160,27 @@ function About() {
               person who's actually doing the work.
             </p>
           </div>
+          <div className="about-point" data-reveal style={revealIndex(0)}>
+            <h3>Second-story windows</h3>
+            <p>
+              Our water-fed pole reaches 40 feet, so we clean upper-floor
+              windows from the ground, with no ladders against your house.
+            </p>
+          </div>
+          <div className="about-point" data-reveal style={revealIndex(1)}>
+            <h3>Screen cleaning</h3>
+            <p>
+              We clean your screens along with the glass, so the view stays
+              clear once they go back in.
+            </p>
+          </div>
+          <div className="about-point" data-reveal style={revealIndex(2)}>
+            <h3>Across the Pensacola area</h3>
+            <p>
+              We serve Pensacola, Gulf Breeze, Pace, Milton, Navarre and
+              Perdido Key.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -1193,7 +1215,7 @@ function Contact({ onQuote }: { onQuote: () => void }) {
           <p suppressHydrationWarning>
             © {new Date().getFullYear()} Dolphin Bay Window Cleaning
           </p>
-          <p>Serving the greater Pensacola area</p>
+          <p>Serving Pensacola, Gulf Breeze, Pace, Milton, Navarre and Perdido Key</p>
           {/* The Dolphin Bay photo is CC BY-SA 2.0, which requires this
               credit. The hero background is CC0 and needs none. */}
           <p className="footer-credit">
