@@ -10,6 +10,7 @@ import {
 import logoMarkUrl from "./assets/logo-mark.png";
 import dolphinBayUrl from "./assets/dolphin-bay-thailand.webp";
 import houseFrontUrl from "./assets/carousel/house-front.jpg";
+import houseFrontPlaceholderUrl from "./assets/placeholders/house-front.webp";
 import frenchDoorsUrl from "./assets/carousel/french-doors.jpg";
 import poleCleaningUrl from "./assets/carousel/pole-cleaning.jpg";
 import brickPorchUrl from "./assets/carousel/brick-porch.jpg";
@@ -874,8 +875,15 @@ function QuoteButton({ onQuote }: { onQuote: () => void }) {
 
 // Each slide is one or more photos. Portrait shots go in pairs so they sit
 // side by side and fill the landscape frame instead of letterboxing.
-const HERO_SLIDES: { src: string; alt: string }[][] = [
-  [{ src: houseFrontUrl, alt: "Front of a two-story home with sparkling dormer and porch windows" }],
+// Only the first slide needs a placeholder — the rest load while it shows.
+const HERO_SLIDES: { src: string; alt: string; placeholder?: string }[][] = [
+  [
+    {
+      src: houseFrontUrl,
+      alt: "Front of a two-story home with sparkling dormer and porch windows",
+      placeholder: houseFrontPlaceholderUrl,
+    },
+  ],
   [
     { src: frenchDoorsUrl, alt: "Cleaning French doors with a water-fed pole" },
     { src: poleCleaningUrl, alt: "Cleaning second-story windows with a water-fed pole" },
@@ -935,6 +943,11 @@ function HeroCarousel() {
               src={photo.src}
               alt={photo.alt}
               loading={i === 0 ? "eager" : "lazy"}
+              style={
+                photo.placeholder
+                  ? { backgroundImage: `url(${photo.placeholder})` }
+                  : undefined
+              }
             />
           ))}
         </div>

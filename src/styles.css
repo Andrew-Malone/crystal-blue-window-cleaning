@@ -218,8 +218,12 @@ select {
      Alternate kept on hand: ./assets/navarre-beach-pier.webp (Taminar,
      CC BY-SA 4.0). It needs a footer credit if it's swapped in:
      https://commons.wikimedia.org/wiki/File:Navarre_Beach_Pier_IGP2095.jpg */
+  /* The second layer is a 32px blurred copy of the photo (small enough for
+     Vite to inline), so the bay's colours show while the full image loads. */
   background-color: var(--seafoam);
-  background-image: url("./assets/pensacola-bay.webp");
+  background-image:
+    url("./assets/pensacola-bay.webp"),
+    url("./assets/placeholders/pensacola-bay.webp");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -274,6 +278,10 @@ select {
 
 .carousel-slide img {
   min-height: 0;
+  /* A blurred placeholder, when the slide sets one, shows until the photo
+     paints over it. */
+  background-position: center;
+  background-size: cover;
 }
 
 .carousel-arrow {
