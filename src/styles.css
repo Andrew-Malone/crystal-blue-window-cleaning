@@ -324,6 +324,9 @@ select {
    photos splits into columns (set inline) with a navy seam between them. */
 .hero-carousel {
   place-items: stretch;
+  /* Leave vertical scrolling and pinch-zoom to the browser; sideways
+     swipes are handled by HeroCarousel. */
+  touch-action: pan-y pinch-zoom;
 }
 
 .carousel-slide {
@@ -412,6 +415,7 @@ select {
 }
 
 .carousel-dots button {
+  position: relative;
   width: 10px;
   height: 10px;
   padding: 0;
@@ -424,6 +428,25 @@ select {
 
 .carousel-dots button.is-active {
   background: var(--sea-green);
+}
+
+/* A 28px tap target around each 10px dot. */
+.carousel-dots button::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+}
+
+/* Touch screens swipe the photos (HeroCarousel), so the arrows only cover
+   them; the dots stay as the tap alternative, spaced for fingers. */
+@media (hover: none), (pointer: coarse) {
+  .carousel-arrow {
+    display: none;
+  }
+
+  .carousel-dots {
+    gap: 14px;
+  }
 }
 
 /* White panel so the copy stays readable over the chessboard, carrying the

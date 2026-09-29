@@ -6,6 +6,7 @@ import {
   type AnimationEvent,
   type CSSProperties,
   type FormEvent,
+  type TouchEvent,
 } from "react";
 import { DateField } from "./DateField";
 import logoMarkUrl from "./assets/logo-mark.png";
@@ -900,21 +901,52 @@ function ChevronIcon({ dir }: { dir: "prev" | "next" }) {
   );
 }
 
+// A swipe must travel this far, and be clearly more sideways than vertical,
+// so an up/down drag still just scrolls the page.
+const SWIPE_MIN_PX = 40;
+
 function HeroCarousel() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  // Once someone swipes to a photo, stop auto-advancing away from it.
+  const [swiped, setSwiped] = useState(false);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const count = HERO_SLIDES.length;
   const go = (next: number) => setIndex((next + count) % count);
 
   // Auto-advance, unless the visitor is interacting with it or has asked
   // for reduced motion. Re-keyed on index so a manual change resets the timer.
   useEffect(() => {
-    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      paused ||
+      swiped ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       return;
     }
     const id = window.setTimeout(() => setIndex((i) => (i + 1) % count), SLIDE_INTERVAL_MS);
     return () => window.clearTimeout(id);
-  }, [index, paused, count]);
+  }, [index, paused, swiped, count]);
+
+  // Phones swipe instead of using the arrows (hidden on touch screens in CSS).
+  const handleTouchStart = (event: TouchEvent<HTMLElement>) => {
+    const touch = event.touches[0];
+    touchStart.current = event.touches.length === 1 ? { x: touch.clientX, y: touch.clientY } : null;
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLElement>) => {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+    setSwiped(true);
+    go(index + (dx < 0 ? 1 : -1));
+  };
 
   return (
     <section
@@ -925,6 +957,9 @@ function HeroCarousel() {
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={() => (touchStart.current = null)}
     >
       {HERO_SLIDES.map((photos, i) => (
         <div
