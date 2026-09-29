@@ -3,7 +3,8 @@
   "name": "crystal-blue-window-cleaning",
   "compatibility_date": "2026-06-19",
   "routes": [
-    { "pattern": "dolphinbaywindows.com", "custom_domain": true }
+    { "pattern": "dolphinbaywindows.com", "custom_domain": true },
+    { "pattern": "www.dolphinbaywindows.com", "custom_domain": true }
   ],
   "assets": {
     "directory": "./dist",
