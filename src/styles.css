@@ -249,6 +249,9 @@ select {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Some browsers draw the alt text while the photo loads; keep it invisible
+     (screen readers still get it). */
+  color: transparent;
 }
 
 /* Slides stack in one grid cell and crossfade. A slide with two portrait
