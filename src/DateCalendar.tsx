@@ -5,11 +5,11 @@ import "react-day-picker/style.css";
 // desktop visitor opens the quote form — see DateField.
 export default function DateCalendar({
   selected,
-  today,
+  earliest,
   onSelect,
 }: {
   selected: Date | undefined;
-  today: Date;
+  earliest: Date;
   onSelect: (date: Date | undefined) => void;
 }) {
   return (
@@ -17,12 +17,10 @@ export default function DateCalendar({
       mode="single"
       selected={selected}
       onSelect={onSelect}
-      defaultMonth={selected ?? today}
-      startMonth={today}
-      disabled={{ before: today }}
+      defaultMonth={selected ?? earliest}
+      startMonth={earliest}
+      disabled={{ before: earliest }}
       weekStartsOn={0}
-      modifiers={{ sunday: { dayOfWeek: [0] } }}
-      modifiersClassNames={{ sunday: "is-sunday" }}
     />
   );
 }

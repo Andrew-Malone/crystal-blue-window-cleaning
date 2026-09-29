@@ -660,6 +660,7 @@ function QuoteForm() {
               </label>
               <DateField
                 label="When do you want the work done by?"
+                hint="We'll reach out to confirm a day that works."
                 name="desiredDate"
                 value={form.desiredDate}
                 onChange={(value) => updateField("desiredDate", value)}
@@ -676,7 +677,7 @@ function QuoteForm() {
               </label>
               {submitState === "sent" ? (
                 <p className="form-status">
-                  Thanks! We received your request and will reach out shortly to confirm.
+                  Thanks! We received your request and will reach out to confirm.
                 </p>
               ) : (
                 <>

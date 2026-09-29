@@ -49,25 +49,30 @@ function CalendarIcon() {
   );
 }
 
-// Desktop browsers draw their own date picker, and some (Firefox) paint both
-// weekend days red — which reads as "we're closed Saturdays". With a mouse we
-// show our own calendar instead, where only Sunday is red. Touch devices keep
-// the native picker, which is better on a phone and doesn't colour weekends.
+// Desktop browsers draw their own date picker, and some (Firefox) paint the
+// weekend days red — which reads as "we're closed weekends". With a mouse we
+// show our own plain calendar instead. Touch devices keep the native picker,
+// which is better on a phone and doesn't colour weekends.
 export function DateField({
   label,
+  hint,
   name,
   value,
   onChange,
 }: {
   label: string;
+  hint?: string;
   name: string;
   value: string;
   onChange: (value: string) => void;
 }) {
+  const hintId = `${useId()}-hint`;
   const [today] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), now.getDate());
   });
+  // Requests need confirming first, so same-day isn't offered.
+  const earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
   // Only ever rendered in the browser (the quote dialog mounts its form on
   // open), so reading matchMedia up front is safe.
   const [custom] = useState(
@@ -87,27 +92,49 @@ export function DateField({
         <input
           name={name}
           type="date"
-          min={toValue(today)}
+          min={toValue(earliest)}
           value={value}
+          aria-describedby={hint ? hintId : undefined}
           onChange={(event) => onChange(event.target.value)}
         />
+        {hint ? (
+          <small id={hintId} className="field-hint">
+            {hint}
+          </small>
+        ) : null}
       </label>
     );
   }
 
-  return <CustomDateField label={label} value={value} onChange={onChange} today={today} />;
+  return (
+    <CustomDateField
+      label={label}
+      hint={hint}
+      hintId={hintId}
+      value={value}
+      onChange={onChange}
+      today={today}
+      earliest={earliest}
+    />
+  );
 }
 
 function CustomDateField({
   label,
+  hint,
+  hintId,
   value,
   onChange,
   today,
+  earliest,
 }: {
   label: string;
+  hint: string | undefined;
+  hintId: string;
   value: string;
   onChange: (value: string) => void;
   today: Date;
+  earliest: Date;
 }) {
   const id = useId();
   const labelId = `${id}-label`;
@@ -165,7 +192,6 @@ function CustomDateField({
     const popover = popoverRef.current;
     const day =
       popover?.querySelector<HTMLButtonElement>(".rdp-selected .rdp-day_button") ??
-      popover?.querySelector<HTMLButtonElement>(".rdp-today .rdp-day_button") ??
       popover?.querySelector<HTMLButtonElement>(".rdp-day_button:not(:disabled)");
     day?.focus();
   };
@@ -186,6 +212,7 @@ function CustomDateField({
         className="date-field-button"
         popoverTarget={popoverId}
         aria-labelledby={`${labelId} ${valueId}`}
+        aria-describedby={hint ? hintId : undefined}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
@@ -194,6 +221,11 @@ function CustomDateField({
         </span>
         <CalendarIcon />
       </button>
+      {hint ? (
+        <small id={hintId} className="field-hint">
+          {hint}
+        </small>
+      ) : null}
       <div
         ref={popoverRef}
         id={popoverId}
@@ -205,7 +237,7 @@ function CustomDateField({
         onToggle={handleToggle}
       >
         <Suspense fallback={null}>
-          <DateCalendar key={session} selected={selected} today={today} onSelect={handleSelect} />
+          <DateCalendar key={session} selected={selected} earliest={earliest} onSelect={handleSelect} />
         </Suspense>
       </div>
     </div>

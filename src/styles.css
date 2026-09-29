@@ -982,15 +982,17 @@ select {
 @media (max-height: 820px) {
   .quote-card {
     gap: 16px;
-    padding-block: 24px;
+    padding-block: 20px;
   }
 
   .quote-card .step-content {
-    gap: 18px;
+    gap: 16px;
   }
 
+  /* rows={3} sets the height; two lines still shows the whole placeholder. */
   .quote-card textarea {
-    min-height: 72px;
+    min-height: 0;
+    height: 72px;
   }
 }
 
@@ -1203,6 +1205,14 @@ input[type="date"] {
 /* ---------- desktop date picker (DateField) ---------- */
 
 /* Looks like the other inputs; opens the calendar popover. */
+/* Small helper text under a field, e.g. the date field's "we'll confirm". */
+.field-hint {
+  margin-top: -2px;
+  color: rgba(7, 29, 61, 0.6);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
 .date-field-button {
   display: flex;
   align-items: center;
@@ -1250,12 +1260,12 @@ textarea::placeholder,
 .date-popover {
   inset: auto;
   margin: 0;
-  padding: 12px 14px;
-  border: 2px solid var(--navy);
-  border-radius: 14px;
-  background: var(--seafoam-tint);
+  padding: 10px 12px;
+  border: 1px solid rgba(7, 29, 61, 0.15);
+  border-radius: 12px;
+  background: white;
   color: var(--navy);
-  box-shadow: 6px 7px 0 var(--navy);
+  box-shadow: 0 10px 30px rgba(7, 29, 61, 0.18);
   font-weight: 400;
 }
 
@@ -1273,8 +1283,7 @@ textarea::placeholder,
 }
 
 .date-popover .rdp-month_caption {
-  font-family: var(--display);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -1283,7 +1292,7 @@ textarea::placeholder,
 }
 
 .date-popover .rdp-day_button:hover:not(:disabled) {
-  background: var(--seafoam);
+  background: var(--seafoam-tint);
 }
 
 .date-popover .rdp-selected .rdp-day_button {
@@ -1291,12 +1300,6 @@ textarea::placeholder,
   background: var(--sea-green-deep);
   color: white;
   font-weight: 600;
-}
-
-/* Only Sunday is red — the week's one closed-looking day. */
-.date-popover .rdp-weekday:first-child,
-.date-popover .is-sunday:not(.rdp-selected) .rdp-day_button {
-  color: #c53030;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
