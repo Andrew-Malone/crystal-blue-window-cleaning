@@ -1,3 +1,57 @@
+/* Metric-matched fallbacks: a system font resized so each web font's
+   text takes the same space before it loads, so the swap doesn't reflow the
+   page. Vertical metrics come from Capsize (@capsizecss/metrics); size-adjust
+   is the measured width ratio of real page text at each weight (the headline
+   is uppercase, which Capsize's lowercase average underestimates). There are
+   separate bold faces because font-synthesis is off. Re-measure if a font or
+   the headline changes. */
+@font-face {
+  font-family: "Bitter Fallback";
+  font-weight: 400 500;
+  src: local("Georgia");
+  ascent-override: 89.80%;
+  descent-override: 25.45%;
+  size-adjust: 104.12%;
+}
+
+@font-face {
+  font-family: "Bitter Fallback";
+  font-weight: 600 700;
+  src: local("Georgia Bold"), local("Georgia-Bold");
+  ascent-override: 103.31%;
+  descent-override: 29.28%;
+  size-adjust: 90.50%;
+}
+
+@font-face {
+  font-family: "Playfair Display Fallback";
+  font-weight: 700;
+  src: local("Georgia Bold"), local("Georgia-Bold");
+  ascent-override: 123.69%;
+  descent-override: 28.69%;
+  size-adjust: 87.48%;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Fallback";
+  font-weight: 400 500;
+  src: local("Arial"), local("ArialMT");
+  ascent-override: 101.88%;
+  descent-override: 27.33%;
+  line-gap-override: 0%;
+  size-adjust: 100.61%;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Fallback";
+  font-weight: 600 700;
+  src: local("Arial Bold"), local("Arial-BoldMT");
+  ascent-override: 105.87%;
+  descent-override: 28.40%;
+  line-gap-override: 0%;
+  size-adjust: 96.82%;
+}
+
 :root {
   /* Deep, clearly blue navy — the page's structural colour, used for the nav,
      the contact block, and every hard offset shadow. */
@@ -35,10 +89,13 @@
   --content-w: 1040px;
   --section-y: clamp(60px, 9vh, 104px);
   --heading-gap: clamp(32px, 5vh, 48px);
-  --display: "Bitter", Georgia, "Times New Roman", serif;
+  /* Self-hosted via @fontsource (imported in main.tsx). Each "Fallback" face
+     is a system font resized to the web font's metrics, so text doesn't
+     reflow when the real font swaps in. */
+  --display: "Bitter Variable", "Bitter Fallback", Georgia, "Times New Roman", serif;
   /* Used only for the hero headline. */
-  --display-hero: "Playfair Display", Georgia, "Times New Roman", serif;
-  --body: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --display-hero: "Playfair Display", "Playfair Display Fallback", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans Variable", "IBM Plex Sans Fallback", Arial, sans-serif;
 
   color: var(--navy);
   background: var(--seafoam);
@@ -470,6 +527,31 @@ select {
 
 .hero-rating:hover .rating-label {
   text-decoration-color: currentColor;
+}
+
+/* On phones the full row is wider than the card, which pushes the Facebook
+   icon onto its own line. Tighten it and drop "Read our" so it stays on one. */
+@media (max-width: 480px) {
+  .hero-social {
+    column-gap: 12px;
+  }
+
+  .hero-rating {
+    gap: 8px;
+  }
+
+  .hero-rating .stars svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .rating-label-lead {
+    display: none;
+  }
+
+  .hero-facebook {
+    padding-left: 12px;
+  }
 }
 
 /* The big CTA: hard navy outline + offset shadow, pressing into the shadow on

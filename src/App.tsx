@@ -719,7 +719,7 @@ function SiteNav({ onQuote }: { onQuote: () => void }) {
     <nav className="site-nav" aria-label="Main">
       <a className="brand" href="#top">
         <span className="brand-mark" aria-hidden="true">
-          <img src={logoMarkUrl} alt="" />
+          <img src={logoMarkUrl} alt="" width={240} height={141} />
         </span>
         <span className="brand-name">
           <b>Dolphin Bay</b>
@@ -1011,7 +1011,9 @@ function Hero({ onQuote }: { onQuote: () => void }) {
           >
             <StarRow />
             <b aria-label="Rated 5 out of 5 stars">5.0</b>
-            <span className="rating-label">Read our Google reviews</span>
+            <span className="rating-label">
+              <span className="rating-label-lead">Read our </span>Google reviews
+            </span>
           </a>
           <a
             className="hero-facebook"
@@ -1152,7 +1154,11 @@ function Contact({ onQuote }: { onQuote: () => void }) {
         </div>
 
         <footer className="site-footer">
-          <p>© {new Date().getFullYear()} Dolphin Bay Window Cleaning</p>
+          {/* The year is baked in at build time; the browser may disagree
+              after New Year until the next deploy. */}
+          <p suppressHydrationWarning>
+            © {new Date().getFullYear()} Dolphin Bay Window Cleaning
+          </p>
           <p>Serving the greater Pensacola area</p>
           {/* The Dolphin Bay photo is CC BY-SA 2.0, which requires this
               credit. The hero background is CC0 and needs none. */}
