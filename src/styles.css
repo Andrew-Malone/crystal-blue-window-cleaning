@@ -112,6 +112,15 @@
 html {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
+  /* Keep the scrollbar's space when the dialog below hides it, so the page
+     doesn't shift sideways (desktops with always-visible scrollbars). */
+  scrollbar-gutter: stable;
+}
+
+/* A modal <dialog> blocks clicks on the page but not scrolling; freeze the
+   page behind it while it's open. */
+html:has(.quote-dialog[open]) {
+  overflow: hidden;
 }
 
 /* Keep in-page jumps from landing under the sticky nav. */
@@ -962,6 +971,27 @@ select {
   background: var(--seafoam-tint);
   box-shadow: 10px 12px 0 var(--navy);
   animation: quoteEnter 0.32s ease both;
+  /* When the card does scroll, reaching its end shouldn't hand the scroll on
+     to the page. */
+  overscroll-behavior: contain;
+}
+
+/* On shorter windows (most laptops) the full-size form ran a few pixels past
+   the card's max-height, so it scrolled and the scrollbar flashed on open.
+   Tighten the vertical rhythm so it fits; really short screens still scroll. */
+@media (max-height: 820px) {
+  .quote-card {
+    gap: 16px;
+    padding-block: 24px;
+  }
+
+  .quote-card .step-content {
+    gap: 18px;
+  }
+
+  .quote-card textarea {
+    min-height: 72px;
+  }
 }
 
 .dialog-close {
