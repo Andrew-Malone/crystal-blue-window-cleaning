@@ -327,6 +327,9 @@ select {
   /* Leave vertical scrolling and pinch-zoom to the browser; sideways
      swipes are handled by HeroCarousel. */
   touch-action: pan-y pinch-zoom;
+  /* The swipe handlers make iOS Safari flash its grey tap-highlight box over
+     the whole carousel when a finger lifts. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .carousel-slide {
