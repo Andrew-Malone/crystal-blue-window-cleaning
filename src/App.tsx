@@ -748,7 +748,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Do you do commercial work?",
-    a: "Yes. We clean offices and storefronts too, and we can come before you open or after you close so we're not in anyone's way.",
+    a: "No. We only clean homes. We'd rather do one thing really well, so your house gets our full attention instead of competing with an office building.",
   },
   {
     q: "Is your cleaning system safe for my plants and pets?",
@@ -1127,7 +1127,7 @@ function About() {
             <p className="about-lede">
               We're Ian and Oliver. We started Dolphin Bay because we were tired
               of contractors who show up late, or not at all, and call that good
-              enough. You should know the people working on your home or business,
+              enough. You should know the people working on your home,
               and you should be able to count on them. When we say we'll be there,
               we're there. And our cleaning is excellent every time.
             </p>
@@ -1152,10 +1152,10 @@ function About() {
             </p>
           </div>
           <div className="about-point" data-reveal style={revealIndex(1)}>
-            <h3>Commercial and residential</h3>
+            <h3>Homes only</h3>
             <p>
-              Single-story and two-story homes, offices, and retail spaces — we
-              quote exterior-only or full inside-and-out cleans either way.
+              We don't take commercial jobs. We're only focused on you and your
+              home, single-story or two-story, exterior-only or inside and out.
             </p>
           </div>
           <div className="about-point" data-reveal style={revealIndex(2)}>
