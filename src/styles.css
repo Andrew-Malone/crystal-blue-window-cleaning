@@ -55,11 +55,11 @@
 :root {
   /* Deep, clearly blue navy — the page's structural colour, used for the nav,
      the contact block, and every hard offset shadow. */
-  --navy: #14335c;
-  --navy-mid: #27497c;
+  --navy: #0c2340;
+  --navy-mid: #1b3a66;
   /* Body copy sits close to full navy — the old 0.74 washed out against the
      pale ground and was hard to read. */
-  --navy-soft: rgba(18, 45, 82, 0.94);
+  --navy-soft: rgba(12, 35, 64, 0.94);
   /* Washed vintage green: still desaturated and blue-leaning, but with enough
      chroma left to read as green rather than grey. */
   --seafoam: #cbe0cf;
@@ -81,8 +81,8 @@
   --gold: #f0b429;
   /* Height of the sticky nav, subtracted from the hero so the hero fills the
      first screen exactly and the next section starts below the fold. Must
-     match the rendered bar: 44px brand mark + 2 x 12px padding. */
-  --nav-h: 68px;
+     match the rendered bar: 52px brand mark + 2 x 16px padding. */
+  --nav-h: 84px;
   /* Page frame: side gutter, content width, the gap between sections and
      the gap under each section heading. */
   --gutter: clamp(18px, 5vw, 60px);
@@ -157,7 +157,7 @@ select {
   display: flex;
   align-items: center;
   gap: clamp(18px, 2.4vw, 34px);
-  padding: 12px var(--gutter);
+  padding: 16px var(--gutter);
   background: var(--navy);
   color: var(--seafoam-tint);
 }
@@ -171,7 +171,7 @@ select {
 }
 
 /* The logo is navy with a see-through belly, so it would vanish on the navy
-   bar — it sits on a cream badge instead. Height stays 44px to match
+   bar — it sits on a cream badge instead. Height stays 52px to match
    --nav-h. */
 .brand-mark {
   display: block;
@@ -181,10 +181,10 @@ select {
   background: #f8f4ea;
 }
 
-/* 34px image + 2 x 5px padding = the 44px badge. */
+/* 42px image + 2 x 5px padding = the 52px badge. */
 .brand-mark img {
   display: block;
-  height: 34px;
+  height: 42px;
   width: auto;
 }
 
@@ -245,11 +245,11 @@ select {
   transform: scaleX(1);
 }
 
-/* A small cousin of .quote-button. Kept under 44px tall so the bar still
+/* A small cousin of .quote-button. Kept under 52px tall so the bar still
    matches --nav-h. */
 .nav-quote {
   flex: none;
-  padding: 9px 18px;
+  padding: 11px 20px;
   border: 2px solid var(--navy);
   border-radius: 999px;
   background: var(--sea-green);
@@ -413,7 +413,7 @@ select {
   gap: 8px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(20, 51, 92, 0.55);
+  background: rgba(12, 35, 64, 0.55);
   transform: translateX(-50%);
 }
 
@@ -517,7 +517,7 @@ select {
 .hero-facebook {
   display: inline-flex;
   padding-left: 16px;
-  border-left: 1px solid rgba(20, 51, 92, 0.25);
+  border-left: 1px solid rgba(12, 35, 64, 0.25);
   color: var(--navy);
   transition: color 160ms ease;
 }
@@ -788,6 +788,27 @@ select {
   text-decoration: none;
 }
 
+/* Under the cards: read the rest on Google. */
+.reviews-links {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(32px, 5vh, 48px);
+}
+
+.reviews-links a {
+  font-family: var(--display);
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+.reviews-links a:hover,
+.reviews-links a:focus-visible {
+  color: var(--sea-green-deep);
+}
+
 /* ---------- about ---------- */
 
 /* Heading and lede on the left, the Dolphin Bay photo on the right. The
@@ -835,7 +856,7 @@ select {
   bottom: 12px;
   padding: 6px 12px;
   border-radius: 8px;
-  background: rgba(20, 51, 92, 0.72);
+  background: rgba(12, 35, 64, 0.72);
   color: #f8f4ea;
   font-size: 0.82rem;
 }

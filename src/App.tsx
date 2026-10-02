@@ -1107,6 +1107,11 @@ function Reviews() {
             </figure>
           ))}
         </div>
+        <div className="reviews-links" data-reveal>
+          <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
+            Read all our reviews on Google →
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -1140,7 +1145,7 @@ function About() {
 
         <div className="about-grid">
           <div className="about-point" data-reveal style={revealIndex(0)}>
-            <h3>Pure water</h3>
+            <h3>Pure water technology</h3>
             <p>
               We clean with deionized water. With the minerals filtered out,
               there's nothing left behind to spot, so your glass dries clear.
@@ -1156,8 +1161,8 @@ function About() {
           <div className="about-point" data-reveal style={revealIndex(2)}>
             <h3>Licensed and insured</h3>
             <p>
-              We're local, not a franchise call center. You talk to the
-              person who's actually doing the work.
+              We're fully insured, so your home and property are covered
+              while we work.
             </p>
           </div>
           <div className="about-point" data-reveal style={revealIndex(0)}>
