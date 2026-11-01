@@ -1253,8 +1253,8 @@ function Hero({ onQuote }: { onQuote: () => void }) {
           <em>Our Pleasure</em>
         </h1>
         <p className="hero-sub">
-          Our goal is to provide quality, satisfying service to Greater
-          Pensacola residents. We believe showing up on time matters, and we
+          Our goal is to provide quality, satisfying window cleaning to Greater
+          Pensacola, FL residents. We believe showing up on time matters, and we
           treat every customer with the respect you deserve.
         </p>
 
