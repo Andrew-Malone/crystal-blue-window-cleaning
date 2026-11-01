@@ -951,15 +951,21 @@ function SlideVideo({
   poster,
   active,
   onNearEnd,
+  onBlockedChange,
 }: {
   src: string;
   poster: string;
   active: boolean;
   // Called once per showing, shortly before the clip reaches its end.
   onNearEnd: () => void;
+  // true when the browser refused to autoplay (e.g. iPhone Low Power Mode),
+  // false once the clip is actually playing.
+  onBlockedChange: (blocked: boolean) => void;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const firedRef = useRef(false);
+  const blockedRef = useRef(onBlockedChange);
+  blockedRef.current = onBlockedChange;
 
   // iOS only autoplays a video whose muted *attribute* is set; React sets the
   // property alone (and server-rendered HTML omits it), so set both by hand.
@@ -977,7 +983,7 @@ function SlideVideo({
     if (active) {
       firedRef.current = false;
       video.currentTime = 0;
-      video.play().catch(() => {});
+      video.play().catch(() => blockedRef.current(true));
       return;
     }
     // Keep it playing through the crossfade (700ms in CSS), then stop it.
@@ -997,6 +1003,7 @@ function SlideVideo({
         playsInline
         preload="auto"
         aria-hidden="true"
+        onPlaying={() => blockedRef.current(false)}
         onTimeUpdate={(e) => {
           const v = e.currentTarget;
           if (!active || firedRef.current || !v.duration) return;
@@ -1015,6 +1022,8 @@ function HeroCarousel() {
   const [paused, setPaused] = useState(false);
   // Once someone swipes to a photo, stop auto-advancing away from it.
   const [swiped, setSwiped] = useState(false);
+  // The video slide can't time itself off a video that isn't playing.
+  const [videoBlocked, setVideoBlocked] = useState(false);
   const count = HERO_SLIDES.length;
   const go = (next: number) => setIndex((next + count) % count);
 
@@ -1029,10 +1038,11 @@ function HeroCarousel() {
       return;
     }
     const current = HERO_SLIDES[index];
-    const delay = (!Array.isArray(current) && current.durationMs) || SLIDE_INTERVAL_MS;
+    const delay =
+      (!Array.isArray(current) && !videoBlocked && current.durationMs) || SLIDE_INTERVAL_MS;
     const id = window.setTimeout(() => setIndex((i) => (i + 1) % count), delay);
     return () => window.clearTimeout(id);
-  }, [index, paused, swiped, count]);
+  }, [index, paused, swiped, count, videoBlocked]);
 
   // Phones swipe instead of using the arrows (hidden on touch screens in CSS).
   // The browser starts scrolling the page as soon as a drag leans even a little
@@ -1108,9 +1118,7 @@ function HeroCarousel() {
     };
     const onDragStart = (e: Event) => e.preventDefault();
 
-    // A tap (or click) with no drag: right half goes forward, left half back.
-    // Touch taps send the emulated mousedown first, so the same start point
-    // tells a tap from the end of a drag.
+    // A mouse click with no drag: right half goes forward, left half back.
     let downX = 0;
     let downY = 0;
     const onPress = (e: MouseEvent) => {
@@ -1118,7 +1126,16 @@ function HeroCarousel() {
       downY = e.clientY;
     };
     const onClick = (e: MouseEvent) => {
+      // Touch screens only swipe; tapping does nothing (and leaves the phone's
+      // own video controls alone).
+      if (window.matchMedia("(hover: none), (pointer: coarse)").matches) return;
       if ((e.target as Element).closest("button")) return;
+      // Clicking a paused video plays it rather than turning the slide.
+      const tappedVideo = (e.target as Element).closest("video");
+      if (tappedVideo && tappedVideo.paused) {
+        tappedVideo.play().catch(() => {});
+        return;
+      }
       if (Math.hypot(e.clientX - downX, e.clientY - downY) > TAP_MAX_PX) return;
       const rect = el.getBoundingClientRect();
       const forward = e.clientX - rect.left >= rect.width / 2;
@@ -1188,6 +1205,7 @@ function HeroCarousel() {
                     src={video.src}
                     poster={video.poster}
                     active={i === index}
+                    onBlockedChange={setVideoBlocked}
                     onNearEnd={() => {
                       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
                       if (!paused && !swiped && !reduced) go(i + 1);
