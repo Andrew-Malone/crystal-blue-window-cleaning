@@ -880,18 +880,16 @@ function QuoteButton({ onQuote }: { onQuote: () => void }) {
 // Each slide is one or more photos. Portrait shots go in pairs so they sit
 // side by side and fill the landscape frame instead of letterboxing.
 // Only the first slide needs a placeholder — the rest load while it shows.
-// The clip is built to loop: its first second dissolves from its last second
-// into the start. The first showing skips that second so it begins clean.
-const WORK_DEMO_LOOP_BLEND_S = 1;
 // The carousel starts its 0.7s crossfade this long before the clip reaches its
-// loop point, measured off the video's own clock. timeupdate only fires about
-// four times a second, so this leaves room for that lag.
+// end (9.5s, where it would jump back to the start), measured off the video's
+// own clock. timeupdate only fires about four times a second, so this leaves
+// room for that lag.
 const VIDEO_FADE_LEAD_S = 1.3;
 
 type HeroPhoto = { src: string; alt: string; placeholder?: string };
 // Photos stack top to bottom; with a video, they sit beside it instead.
 type HeroStackSlide = {
-  video?: { src: string; poster: string; startAt: number };
+  video?: { src: string; poster: string };
   stacked: HeroPhoto[];
   durationMs?: number;
 };
@@ -904,7 +902,7 @@ type HeroStackSlide = {
 //      placeholder: houseFrontPlaceholderUrl }],
 const HERO_SLIDES: (HeroPhoto[] | HeroStackSlide)[] = [
   {
-    video: { src: workDemoUrl, poster: workDemoPosterUrl, startAt: WORK_DEMO_LOOP_BLEND_S },
+    video: { src: workDemoUrl, poster: workDemoPosterUrl },
     // Normally the video itself triggers the crossfade (see SlideVideo). This
     // is only a backstop if it never plays, e.g. autoplay blocked.
     durationMs: 14000,
@@ -951,15 +949,13 @@ const SWIPE_SIDEWAYS_BIAS = 0.85;
 function SlideVideo({
   src,
   poster,
-  startAt,
   active,
   onNearEnd,
 }: {
   src: string;
   poster: string;
-  startAt: number;
   active: boolean;
-  // Called once per showing, shortly before the clip reaches its loop point.
+  // Called once per showing, shortly before the clip reaches its end.
   onNearEnd: () => void;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -980,20 +976,20 @@ function SlideVideo({
     if (!video) return;
     if (active) {
       firedRef.current = false;
-      video.currentTime = startAt;
+      video.currentTime = 0;
       video.play().catch(() => {});
       return;
     }
     // Keep it playing through the crossfade (700ms in CSS), then stop it.
     const id = window.setTimeout(() => video.pause(), 800);
     return () => window.clearTimeout(id);
-  }, [active, startAt]);
+  }, [active]);
 
   return (
     <div className="stack-cell">
       <video
         ref={ref}
-        src={`${src}#t=${startAt}`}
+        src={src}
         poster={poster}
         muted
         loop
@@ -1191,7 +1187,6 @@ function HeroCarousel() {
                   <SlideVideo
                     src={video.src}
                     poster={video.poster}
-                    startAt={video.startAt}
                     active={i === index}
                     onNearEnd={() => {
                       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
