@@ -6,7 +6,6 @@ import {
   type AnimationEvent,
   type CSSProperties,
   type FormEvent,
-  type TouchEvent,
 } from "react";
 import { DateField } from "./DateField";
 import logoMarkUrl from "./assets/logo-mark.png";
@@ -929,13 +928,30 @@ function ChevronIcon({ dir }: { dir: "prev" | "next" }) {
   );
 }
 
-// A swipe must travel this far, and be clearly more sideways than vertical,
-// so an up/down drag still just scrolls the page.
+// A swipe must travel this far to turn the page...
 const SWIPE_MIN_PX = 40;
+// ...and the drag's direction is judged after this much movement. Anything
+// within roughly 50 degrees of horizontal counts as a swipe (bias 0.85 =
+// tan 40 degrees), so a slightly slanted thumb still turns the slide.
+const SWIPE_LOCK_PX = 8;
+// A press that moves less than this is a tap, not a drag.
+const TAP_MAX_PX = 10;
+const SWIPE_SIDEWAYS_BIAS = 0.85;
 
 // Muted, looping clip that only plays while its slide is showing.
 function SlideVideo({ src, poster, active }: { src: string; poster: string; active: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
+
+  // iOS only autoplays a video whose muted *attribute* is set; React sets the
+  // property alone (and server-rendered HTML omits it), so set both by hand.
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    video.muted = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+  }, []);
+
   useEffect(() => {
     const video = ref.current;
     if (!video) return;
@@ -946,17 +962,21 @@ function SlideVideo({ src, poster, active }: { src: string; poster: string; acti
       video.pause();
     }
   }, [active]);
+
   return (
-    <video
-      ref={ref}
-      src={src}
-      poster={poster}
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      aria-hidden="true"
-    />
+    <div className="stack-cell">
+      <video
+        ref={ref}
+        src={src}
+        poster={poster}
+        muted
+        loop
+        autoPlay={active}
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      />
+    </div>
   );
 }
 
@@ -965,7 +985,6 @@ function HeroCarousel() {
   const [paused, setPaused] = useState(false);
   // Once someone swipes to a photo, stop auto-advancing away from it.
   const [swiped, setSwiped] = useState(false);
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const count = HERO_SLIDES.length;
   const go = (next: number) => setIndex((next + count) % count);
 
@@ -986,27 +1005,114 @@ function HeroCarousel() {
   }, [index, paused, swiped, count]);
 
   // Phones swipe instead of using the arrows (hidden on touch screens in CSS).
-  const handleTouchStart = (event: TouchEvent<HTMLElement>) => {
-    const touch = event.touches[0];
-    touchStart.current = event.touches.length === 1 ? { x: touch.clientX, y: touch.clientY } : null;
-  };
+  // The browser starts scrolling the page as soon as a drag leans even a little
+  // vertical, so the first few pixels of movement decide the gesture: leaning
+  // sideways at all claims it for the carousel (touchmove must be a non-passive
+  // listener to be allowed to stop the scroll); mostly vertical lets it scroll.
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    let gesture: { x: number; y: number; axis: "x" | "y" | null } | null = null;
 
-  const handleTouchEnd = (event: TouchEvent<HTMLElement>) => {
-    const start = touchStart.current;
-    touchStart.current = null;
-    if (!start) return;
+    const onStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      gesture = e.touches.length === 1 ? { x: t.clientX, y: t.clientY, axis: null } : null;
+    };
+    const onMove = (e: TouchEvent) => {
+      if (!gesture || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dx = t.clientX - gesture.x;
+      const dy = t.clientY - gesture.y;
+      if (!gesture.axis && Math.hypot(dx, dy) > SWIPE_LOCK_PX) {
+        gesture.axis = Math.abs(dx) > Math.abs(dy) * SWIPE_SIDEWAYS_BIAS ? "x" : "y";
+      }
+      if (gesture.axis === "x" && e.cancelable) e.preventDefault();
+    };
+    const onEnd = (e: TouchEvent) => {
+      const g = gesture;
+      gesture = null;
+      if (!g || g.axis !== "x") return;
+      const dx = e.changedTouches[0].clientX - g.x;
+      if (Math.abs(dx) < SWIPE_MIN_PX) return;
+      setSwiped(true);
+      setIndex((i) => (i + (dx < 0 ? 1 : -1) + count) % count);
+    };
+    const onCancel = () => {
+      gesture = null;
+    };
 
-    const touch = event.changedTouches[0];
-    const dx = touch.clientX - start.x;
-    const dy = touch.clientY - start.y;
-    if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd);
+    el.addEventListener("touchcancel", onCancel);
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onCancel);
+    };
+  }, [count]);
 
-    setSwiped(true);
-    go(index + (dx < 0 ? 1 : -1));
-  };
+  // Mice drag the same way. The browser's own image drag has to be switched off
+  // or it picks the photo up instead of turning the page.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    let startX: number | null = null;
+    let startY = 0;
+
+    const onDown = (e: MouseEvent) => {
+      if (e.button !== 0 || (e.target as Element).closest("button")) return;
+      startX = e.clientX;
+      startY = e.clientY;
+    };
+    const onUp = (e: MouseEvent) => {
+      if (startX === null) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      startX = null;
+      if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * SWIPE_SIDEWAYS_BIAS) return;
+      setSwiped(true);
+      setIndex((i) => (i + (dx < 0 ? 1 : -1) + count) % count);
+    };
+    const onDragStart = (e: Event) => e.preventDefault();
+
+    // A tap (or click) with no drag: right half goes forward, left half back.
+    // Touch taps send the emulated mousedown first, so the same start point
+    // tells a tap from the end of a drag.
+    let downX = 0;
+    let downY = 0;
+    const onPress = (e: MouseEvent) => {
+      downX = e.clientX;
+      downY = e.clientY;
+    };
+    const onClick = (e: MouseEvent) => {
+      if ((e.target as Element).closest("button")) return;
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > TAP_MAX_PX) return;
+      const rect = el.getBoundingClientRect();
+      const forward = e.clientX - rect.left >= rect.width / 2;
+      setSwiped(true);
+      setIndex((i) => (i + (forward ? 1 : -1) + count) % count);
+    };
+
+    el.addEventListener("mousedown", onPress);
+    el.addEventListener("click", onClick);
+    el.addEventListener("mousedown", onDown);
+    el.addEventListener("dragstart", onDragStart);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      el.removeEventListener("mousedown", onPress);
+      el.removeEventListener("click", onClick);
+      el.removeEventListener("mousedown", onDown);
+      el.removeEventListener("dragstart", onDragStart);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [count]);
 
   return (
     <section
+      ref={sectionRef}
       className="hero-media hero-carousel"
       aria-roledescription="carousel"
       aria-label="Recent work"
@@ -1014,9 +1120,6 @@ function HeroCarousel() {
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={() => (touchStart.current = null)}
     >
       {HERO_SLIDES.map((slide, i) => {
         const photos = Array.isArray(slide) ? slide : slide.stacked;
@@ -1053,7 +1156,13 @@ function HeroCarousel() {
                 {video && (
                   <SlideVideo src={video.src} poster={video.poster} active={i === index} />
                 )}
-                <div className="carousel-stack">{photos.map(renderPhoto)}</div>
+                <div className="carousel-stack">
+                  {photos.map((photo) => (
+                    <div key={photo.src} className="stack-cell">
+                      {renderPhoto(photo)}
+                    </div>
+                  ))}
+                </div>
               </>
             ) : (
               photos.map(renderPhoto)
