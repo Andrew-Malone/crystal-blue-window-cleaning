@@ -880,10 +880,18 @@ function QuoteButton({ onQuote }: { onQuote: () => void }) {
 // Each slide is one or more photos. Portrait shots go in pairs so they sit
 // side by side and fill the landscape frame instead of letterboxing.
 // Only the first slide needs a placeholder — the rest load while it shows.
+// The clip is built to loop: its first second dissolves from its last second
+// into the start. The first showing skips that second so it begins clean.
+const WORK_DEMO_LOOP_BLEND_S = 1;
+// The carousel starts its 0.7s crossfade this long before the clip reaches its
+// loop point, measured off the video's own clock. timeupdate only fires about
+// four times a second, so this leaves room for that lag.
+const VIDEO_FADE_LEAD_S = 1.3;
+
 type HeroPhoto = { src: string; alt: string; placeholder?: string };
 // Photos stack top to bottom; with a video, they sit beside it instead.
 type HeroStackSlide = {
-  video?: { src: string; poster: string };
+  video?: { src: string; poster: string; startAt: number };
   stacked: HeroPhoto[];
   durationMs?: number;
 };
@@ -896,9 +904,10 @@ type HeroStackSlide = {
 //      placeholder: houseFrontPlaceholderUrl }],
 const HERO_SLIDES: (HeroPhoto[] | HeroStackSlide)[] = [
   {
-    video: { src: workDemoUrl, poster: workDemoPosterUrl },
-    // Hold until the clip has played through (it is 10.5s long).
-    durationMs: 10500,
+    video: { src: workDemoUrl, poster: workDemoPosterUrl, startAt: WORK_DEMO_LOOP_BLEND_S },
+    // Normally the video itself triggers the crossfade (see SlideVideo). This
+    // is only a backstop if it never plays, e.g. autoplay blocked.
+    durationMs: 14000,
     stacked: [
       { src: lampBeforeUrl, alt: "Before: a brick-mounted lantern with dusty, cloudy glass" },
       { src: lampAfterUrl, alt: "After: the same lantern with clear, clean glass" },
@@ -939,8 +948,22 @@ const TAP_MAX_PX = 10;
 const SWIPE_SIDEWAYS_BIAS = 0.85;
 
 // Muted, looping clip that only plays while its slide is showing.
-function SlideVideo({ src, poster, active }: { src: string; poster: string; active: boolean }) {
+function SlideVideo({
+  src,
+  poster,
+  startAt,
+  active,
+  onNearEnd,
+}: {
+  src: string;
+  poster: string;
+  startAt: number;
+  active: boolean;
+  // Called once per showing, shortly before the clip reaches its loop point.
+  onNearEnd: () => void;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
+  const firedRef = useRef(false);
 
   // iOS only autoplays a video whose muted *attribute* is set; React sets the
   // property alone (and server-rendered HTML omits it), so set both by hand.
@@ -956,18 +979,21 @@ function SlideVideo({ src, poster, active }: { src: string; poster: string; acti
     const video = ref.current;
     if (!video) return;
     if (active) {
-      video.currentTime = 0;
+      firedRef.current = false;
+      video.currentTime = startAt;
       video.play().catch(() => {});
-    } else {
-      video.pause();
+      return;
     }
-  }, [active]);
+    // Keep it playing through the crossfade (700ms in CSS), then stop it.
+    const id = window.setTimeout(() => video.pause(), 800);
+    return () => window.clearTimeout(id);
+  }, [active, startAt]);
 
   return (
     <div className="stack-cell">
       <video
         ref={ref}
-        src={src}
+        src={`${src}#t=${startAt}`}
         poster={poster}
         muted
         loop
@@ -975,6 +1001,14 @@ function SlideVideo({ src, poster, active }: { src: string; poster: string; acti
         playsInline
         preload="auto"
         aria-hidden="true"
+        onTimeUpdate={(e) => {
+          const v = e.currentTarget;
+          if (!active || firedRef.current || !v.duration) return;
+          if (v.currentTime >= v.duration - VIDEO_FADE_LEAD_S) {
+            firedRef.current = true;
+            onNearEnd();
+          }
+        }}
       />
     </div>
   );
@@ -1154,7 +1188,16 @@ function HeroCarousel() {
             {isStack ? (
               <>
                 {video && (
-                  <SlideVideo src={video.src} poster={video.poster} active={i === index} />
+                  <SlideVideo
+                    src={video.src}
+                    poster={video.poster}
+                    startAt={video.startAt}
+                    active={i === index}
+                    onNearEnd={() => {
+                      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                      if (!paused && !swiped && !reduced) go(i + 1);
+                    }}
+                  />
                 )}
                 <div className="carousel-stack">
                   {photos.map((photo) => (
