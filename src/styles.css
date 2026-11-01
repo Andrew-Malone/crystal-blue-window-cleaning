@@ -351,6 +351,39 @@ select {
   transition: opacity 700ms ease;
 }
 
+/* Video slide: clip fills the left half, before/after photos stack on the right. */
+.carousel-slide--stack {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.carousel-slide--video {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.carousel-slide video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+}
+
+.carousel-stack {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  min-height: 0;
+}
+
+.carousel-stack img {
+  object-position: center 40%;
+}
+
+/* Mute the "before" so the clean "after" reads as the brighter one. */
+.carousel-stack img:first-child {
+  filter: brightness(0.6) saturate(0.45);
+}
+
 .carousel-slide img {
   min-height: 0;
   /* A blurred placeholder, when the slide sets one, shows until the photo

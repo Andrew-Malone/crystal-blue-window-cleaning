@@ -11,11 +11,16 @@ import {
 import { DateField } from "./DateField";
 import logoMarkUrl from "./assets/logo-mark.png";
 import dolphinBayUrl from "./assets/dolphin-bay-thailand.webp";
-import houseFrontUrl from "./assets/carousel/house-front.jpg";
-import houseFrontPlaceholderUrl from "./assets/placeholders/house-front.webp";
-import frenchDoorsUrl from "./assets/carousel/french-doors.jpg";
+import poleGroundUrl from "./assets/carousel/pole-ground.jpg";
 import poleCleaningUrl from "./assets/carousel/pole-cleaning.jpg";
 import brickPorchUrl from "./assets/carousel/brick-porch.jpg";
+import workDemoUrl from "./assets/carousel/work-demo.mp4";
+import workDemoPosterUrl from "./assets/carousel/work-demo-poster.jpg";
+import lampBeforeUrl from "./assets/carousel/lamp-before.jpg";
+import lampAfterUrl from "./assets/carousel/lamp-after.jpg";
+import windowsBeforeUrl from "./assets/carousel/windows-before.jpg";
+import windowsAfterUrl from "./assets/carousel/windows-after.jpg";
+import teamUrl from "./assets/carousel/team.jpg";
 
 type Pt = { x: number; y: number };
 
@@ -876,19 +881,42 @@ function QuoteButton({ onQuote }: { onQuote: () => void }) {
 // Each slide is one or more photos. Portrait shots go in pairs so they sit
 // side by side and fill the landscape frame instead of letterboxing.
 // Only the first slide needs a placeholder — the rest load while it shows.
-const HERO_SLIDES: { src: string; alt: string; placeholder?: string }[][] = [
+type HeroPhoto = { src: string; alt: string; placeholder?: string };
+// Photos stack top to bottom; with a video, they sit beside it instead.
+type HeroStackSlide = {
+  video?: { src: string; poster: string };
+  stacked: HeroPhoto[];
+  durationMs?: number;
+};
+
+// Retired from the carousel (files kept in src/assets/carousel/french-doors.jpg,
+// src/assets/carousel/clean-door.jpg,
+// src/assets/carousel/house-front.jpg and
+// src/assets/placeholders/house-front.webp). To bring it back, import both and add:
+//   [{ src: houseFrontUrl, alt: "Front of a two-story home with sparkling dormer and porch windows",
+//      placeholder: houseFrontPlaceholderUrl }],
+const HERO_SLIDES: (HeroPhoto[] | HeroStackSlide)[] = [
+  {
+    video: { src: workDemoUrl, poster: workDemoPosterUrl },
+    // Hold until the clip has played through (it is 10.5s long).
+    durationMs: 10500,
+    stacked: [
+      { src: lampBeforeUrl, alt: "Before: a brick-mounted lantern with dusty, cloudy glass" },
+      { src: lampAfterUrl, alt: "After: the same lantern with clear, clean glass" },
+    ],
+  },
+  {
+    stacked: [
+      { src: windowsBeforeUrl, alt: "Before: dusty, cloudy upper-story casement windows" },
+      { src: windowsAfterUrl, alt: "After: the same windows, clear and reflecting the sky" },
+    ],
+  },
   [
-    {
-      src: houseFrontUrl,
-      alt: "Front of a two-story home with sparkling dormer and porch windows",
-      placeholder: houseFrontPlaceholderUrl,
-    },
-  ],
-  [
-    { src: frenchDoorsUrl, alt: "Cleaning French doors with a water-fed pole" },
+    { src: poleGroundUrl, alt: "Cleaning a ground-floor window with a water-fed pole" },
     { src: poleCleaningUrl, alt: "Cleaning second-story windows with a water-fed pole" },
   ],
   [{ src: brickPorchUrl, alt: "Clean French doors and windows along a brick porch" }],
+  [{ src: teamUrl, alt: "The three Crystal Blue window cleaners standing side by side in front of a home" }],
 ];
 
 const SLIDE_INTERVAL_MS = 6000;
@@ -904,6 +932,33 @@ function ChevronIcon({ dir }: { dir: "prev" | "next" }) {
 // A swipe must travel this far, and be clearly more sideways than vertical,
 // so an up/down drag still just scrolls the page.
 const SWIPE_MIN_PX = 40;
+
+// Muted, looping clip that only plays while its slide is showing.
+function SlideVideo({ src, poster, active }: { src: string; poster: string; active: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    if (active) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  }, [active]);
+  return (
+    <video
+      ref={ref}
+      src={src}
+      poster={poster}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-hidden="true"
+    />
+  );
+}
 
 function HeroCarousel() {
   const [index, setIndex] = useState(0);
@@ -924,7 +979,9 @@ function HeroCarousel() {
     ) {
       return;
     }
-    const id = window.setTimeout(() => setIndex((i) => (i + 1) % count), SLIDE_INTERVAL_MS);
+    const current = HERO_SLIDES[index];
+    const delay = (!Array.isArray(current) && current.durationMs) || SLIDE_INTERVAL_MS;
+    const id = window.setTimeout(() => setIndex((i) => (i + 1) % count), delay);
     return () => window.clearTimeout(id);
   }, [index, paused, swiped, count]);
 
@@ -961,32 +1018,49 @@ function HeroCarousel() {
       onTouchEnd={handleTouchEnd}
       onTouchCancel={() => (touchStart.current = null)}
     >
-      {HERO_SLIDES.map((photos, i) => (
-        <div
-          key={i}
-          className={`carousel-slide${i === index ? " is-active" : ""}`}
-          role="group"
-          aria-roledescription="slide"
-          aria-label={`${i + 1} of ${count}`}
-          aria-hidden={i !== index}
-          style={{ gridTemplateColumns: `repeat(${photos.length}, minmax(0, 1fr))` }}
-        >
-          {photos.map((photo) => (
-            <img
-              key={photo.src}
-              src={photo.src}
-              alt={photo.alt}
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchPriority={i === 0 ? "high" : undefined}
-              style={
-                photo.placeholder
-                  ? { backgroundImage: `url(${photo.placeholder})` }
-                  : undefined
-              }
-            />
-          ))}
-        </div>
-      ))}
+      {HERO_SLIDES.map((slide, i) => {
+        const photos = Array.isArray(slide) ? slide : slide.stacked;
+        const isStack = !Array.isArray(slide);
+        const video = Array.isArray(slide) ? undefined : slide.video;
+        const renderPhoto = (photo: HeroPhoto) => (
+          <img
+            key={photo.src}
+            src={photo.src}
+            alt={photo.alt}
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : undefined}
+            style={
+              photo.placeholder
+                ? { backgroundImage: `url(${photo.placeholder})` }
+                : undefined
+            }
+          />
+        );
+        return (
+          <div
+            key={i}
+            className={`carousel-slide${i === index ? " is-active" : ""}${isStack ? " carousel-slide--stack" : ""}${video ? " carousel-slide--video" : ""}`}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${count}`}
+            aria-hidden={i !== index}
+            style={
+              isStack ? undefined : { gridTemplateColumns: `repeat(${photos.length}, minmax(0, 1fr))` }
+            }
+          >
+            {isStack ? (
+              <>
+                {video && (
+                  <SlideVideo src={video.src} poster={video.poster} active={i === index} />
+                )}
+                <div className="carousel-stack">{photos.map(renderPhoto)}</div>
+              </>
+            ) : (
+              photos.map(renderPhoto)
+            )}
+          </div>
+        );
+      })}
 
       <button
         type="button"
