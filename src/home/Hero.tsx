@@ -66,7 +66,7 @@ const HERO_SLIDES: (HeroPhoto[] | HeroStackSlide)[] = [
     { src: poleCleaningUrl, alt: "Cleaning second-story windows with a water-fed pole" },
   ],
   [{ src: brickPorchUrl, alt: "Clean French doors and windows along a brick porch" }],
-  [{ src: teamUrl, alt: "The three Crystal Blue window cleaners standing side by side in front of a home" }],
+  [{ src: teamUrl, alt: "The three Dolphin Bay window cleaners standing side by side in front of a home" }],
 ];
 
 const SLIDE_INTERVAL_MS = 6000;
@@ -164,6 +164,10 @@ function SlideVideo({
 function HeroCarousel() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  // Off screen, the carousel stops entirely: no video decoding and no
+  // crossfades the visitor can't see, both of which cost scroll smoothness
+  // on a phone.
+  const [visible, setVisible] = useState(true);
   // Once someone swipes to a photo, stop auto-advancing away from it.
   const [swiped, setSwiped] = useState(false);
   // The video slide can't time itself off a video that isn't playing.
@@ -185,6 +189,7 @@ function HeroCarousel() {
   useEffect(() => {
     if (
       paused ||
+      !visible ||
       swiped ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
@@ -195,14 +200,25 @@ function HeroCarousel() {
       (!Array.isArray(current) && !videoBlocked && current.durationMs) || SLIDE_INTERVAL_MS;
     const id = window.setTimeout(() => setIndex((i) => (i + 1) % count), delay);
     return () => window.clearTimeout(id);
-  }, [index, paused, swiped, count, videoBlocked]);
+  }, [index, paused, visible, swiped, count, videoBlocked]);
 
   // Phones swipe instead of using the arrows (hidden on touch screens in CSS).
-  // The browser starts scrolling the page as soon as a drag leans even a little
-  // vertical, so the first few pixels of movement decide the gesture: leaning
-  // sideways at all claims it for the carousel (touchmove must be a non-passive
-  // listener to be allowed to stop the scroll); mostly vertical lets it scroll.
+  // The first few pixels of movement decide the gesture: leaning sideways
+  // claims it for the carousel, mostly vertical is a page scroll. Every
+  // listener is passive: the CSS touch-action on the carousel already keeps a
+  // sideways drag from scrolling anything, and a non-passive touchmove made
+  // Safari wait on JavaScript for each finger movement that started here.
   const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {
+      rootMargin: "100px 0px",
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -220,7 +236,6 @@ function HeroCarousel() {
       if (!gesture.axis && Math.hypot(dx, dy) > SWIPE_LOCK_PX) {
         gesture.axis = Math.abs(dx) > Math.abs(dy) * SWIPE_SIDEWAYS_BIAS ? "x" : "y";
       }
-      if (gesture.axis === "x" && e.cancelable) e.preventDefault();
     };
     const onEnd = (e: TouchEvent) => {
       const g = gesture;
@@ -236,7 +251,7 @@ function HeroCarousel() {
     };
 
     el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchmove", onMove, { passive: true });
     el.addEventListener("touchend", onEnd);
     el.addEventListener("touchcancel", onCancel);
     return () => {
@@ -330,6 +345,7 @@ function HeroCarousel() {
             key={photo.src}
             src={i <= reach ? photo.src : undefined}
             alt={photo.alt}
+            decoding="async"
             loading={i === 0 ? "eager" : "lazy"}
             fetchPriority={i === 0 ? "high" : undefined}
             style={
@@ -357,11 +373,11 @@ function HeroCarousel() {
                   <SlideVideo
                     src={video.src}
                     poster={video.poster}
-                    active={i === index}
+                    active={i === index && visible}
                     onBlockedChange={setVideoBlocked}
                     onNearEnd={() => {
                       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-                      if (!paused && !swiped && !reduced) go(i + 1);
+                      if (!paused && visible && !swiped && !reduced) go(i + 1);
                     }}
                   />
                 )}

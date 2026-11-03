@@ -22,6 +22,7 @@ export function About() {
               src={dolphinBayUrl}
               alt="A painted Thai fishing boat pulled up on the beach at Dolphin Bay at dusk"
               loading="lazy"
+              decoding="async"
             />
             <figcaption>Dolphin Bay, Thailand: the bay we're named after.</figcaption>
           </figure>
