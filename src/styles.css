@@ -578,7 +578,7 @@ select {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px 16px;
-  margin: clamp(18px, 2.6vh, 26px) 0 clamp(24px, 3.6vh, 34px);
+  margin: clamp(18px, 2.6vh, 26px) 0 clamp(18px, 2.8vh, 26px);
 }
 
 .hero-rating {
@@ -667,17 +667,19 @@ select {
 }
 
 /* Quote on top, then the call and plans buttons as a matched pair. All three
-   share the hero's width budget. */
+   share the hero's width budget. The gaps allow for the offset shadows (10px
+   under the quote button, 5-6px on the twins), so the space the eye sees
+   between the buttons is about 16px, not the raw grid gap. */
 .hero-actions {
   display: grid;
-  gap: 16px;
+  gap: 26px;
   width: min(440px, 100%);
 }
 
 .hero-twins {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 .twin-button {
@@ -2173,7 +2175,7 @@ textarea:focus {
 
   .hero-twins {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 20px;
   }
 
   .field-grid,

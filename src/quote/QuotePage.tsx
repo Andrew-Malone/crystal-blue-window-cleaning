@@ -7,6 +7,7 @@ const SERVICES = [
   { id: "interior", label: "Interior windows" },
   { id: "screens", label: "Screens" },
   { id: "tracks", label: "Window tracks" },
+  { id: "gutters", label: "Gutter cleaning" },
 ] as const;
 
 const STORIES = [
