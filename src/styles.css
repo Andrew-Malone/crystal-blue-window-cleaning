@@ -403,7 +403,7 @@ select {
   overflow: hidden;
 }
 
-.stack-cell img,
+.stack-cell .carousel-photo,
 .stack-cell video {
   position: absolute;
   inset: 0;
@@ -425,16 +425,36 @@ select {
 }
 
 /* Mute the "before" so the clean "after" reads as the brighter one. */
-.carousel-stack .stack-cell:first-child img {
+.carousel-stack .stack-cell:first-child .carousel-photo {
   filter: brightness(0.6) saturate(0.45);
 }
 
-.carousel-slide img {
+/* Each photo sits over a tiny blurred copy of itself (CarouselPhoto) and fades
+   in once it has fully loaded, instead of painting top-down as the bytes
+   arrive. The photo is absolutely positioned so the wrapper, not the image,
+   takes the grid cell: iOS Safari won't resolve an image's height:100% inside
+   these grids. */
+.carousel-photo {
+  position: relative;
+  display: block;
   min-height: 0;
-  /* A blurred placeholder, when the slide sets one, shows until the photo
-     paints over it. */
+  overflow: hidden;
   background-position: center;
   background-size: cover;
+}
+
+.carousel-photo img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+/* Without JavaScript nothing would ever add .is-loaded, so show the photo
+   outright (index.html marks <html class="js"> before the page renders). */
+.carousel-photo img.is-loaded,
+html:not(.js) .carousel-photo img {
+  opacity: 1;
 }
 
 .carousel-arrow {

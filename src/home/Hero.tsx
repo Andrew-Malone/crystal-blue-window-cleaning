@@ -1,28 +1,66 @@
 import { useEffect, useRef, useState } from "react";
 import { GOOGLE_REVIEWS_URL, FACEBOOK_URL, PHONE_DISPLAY, PHONE_TEL, FacebookIcon, PhoneIcon, PlanIcon, QuoteButton, StarRow } from "../shared";
-import poleGroundUrl from "../assets/carousel/pole-ground.webp";
-import poleCleaningUrl from "../assets/carousel/pole-cleaning.webp";
-import brickPorchUrl from "../assets/carousel/brick-porch.webp";
 import workDemoUrl from "../assets/carousel/work-demo.mp4";
 import workDemoPosterUrl from "../assets/carousel/work-demo-poster.webp";
-import lampBeforeUrl from "../assets/carousel/lamp-before.webp";
-import lampAfterUrl from "../assets/carousel/lamp-after.webp";
-import lampBeforePlaceholderUrl from "../assets/placeholders/lamp-before.webp";
-import lampAfterPlaceholderUrl from "../assets/placeholders/lamp-after.webp";
-import windowsBeforeUrl from "../assets/carousel/windows-before.webp";
-import windowsAfterUrl from "../assets/carousel/windows-after.webp";
-import teamUrl from "../assets/carousel/team.webp";
+
+// Every carousel photo and its blur-up placeholder, keyed by file path.
+// scripts/carousel-images.sh (npm run images) makes the width variants and
+// placeholders from the full-size originals; carouselPhoto() below picks
+// them up by name. Eager globs are plain asset imports, so Vite fingerprints
+// each file and inlines the tiny placeholders as data: URIs.
+const CAROUSEL_FILES = import.meta.glob<string>("../assets/carousel/*.webp", {
+  eager: true,
+  import: "default",
+});
+const PLACEHOLDER_FILES = import.meta.glob<string>("../assets/placeholders/*.webp", {
+  eager: true,
+  import: "default",
+});
+
+// How much of the carousel a photo spans, as the browser needs it for srcset:
+// the full frame, or half of it (a stacked pair). Under 940px the hero is one
+// column and the carousel is the viewport minus the gutters; above it the
+// carousel is the hero's left column, about half the viewport.
+const PHOTO_SIZES = {
+  full: "(max-width: 940px) 90vw, calc(50vw - 90px)",
+  half: "(max-width: 940px) 45vw, calc(25vw - 45px)",
+};
+// The widths scripts/carousel-images.sh makes for each span. The original is
+// the last candidate.
+const PHOTO_WIDTHS = {
+  full: [640, 960, 1280],
+  half: [450, 600, 900],
+};
+
+type HeroPhoto = { src: string; srcSet: string; sizes: string; alt: string; placeholder: string };
+
+function carouselPhoto(name: string, span: keyof typeof PHOTO_SIZES, alt: string): HeroPhoto {
+  const file = (suffix: string) => {
+    const url = CAROUSEL_FILES[`../assets/carousel/${name}${suffix}.webp`];
+    if (!url) throw new Error(`Missing carousel photo ${name}${suffix}.webp; run npm run images`);
+    return url;
+  };
+  const placeholder = PLACEHOLDER_FILES[`../assets/placeholders/${name}.webp`];
+  if (!placeholder) throw new Error(`Missing placeholder for ${name}; run npm run images`);
+  const widths = PHOTO_WIDTHS[span];
+  const original = widths[widths.length - 1];
+  return {
+    src: file(""),
+    srcSet: widths.map((w) => `${w === original ? file("") : file(`-${w}`)} ${w}w`).join(", "),
+    sizes: PHOTO_SIZES[span],
+    alt,
+    placeholder,
+  };
+}
 
 // Each slide is one or more photos. Portrait shots go in pairs so they sit
 // side by side and fill the landscape frame instead of letterboxing.
-// Only the first slide needs a placeholder — the rest load while it shows.
 // The carousel starts its 0.7s crossfade this long before the clip reaches its
 // end (9.5s, where it would jump back to the start), measured off the video's
 // own clock. timeupdate only fires about four times a second, so this leaves
 // room for that lag.
 const VIDEO_FADE_LEAD_S = 1.3;
 
-type HeroPhoto = { src: string; alt: string; placeholder?: string };
 // Photos stack top to bottom; with a video, they sit beside it instead.
 type HeroStackSlide = {
   video?: { src: string; poster: string };
@@ -31,11 +69,10 @@ type HeroStackSlide = {
 };
 
 // Retired from the carousel (files kept in src/assets/carousel/french-doors.jpg,
-// src/assets/carousel/clean-door.jpg,
-// src/assets/carousel/house-front.jpg and
-// src/assets/placeholders/house-front.webp). To bring it back, import both and add:
-//   [{ src: houseFrontUrl, alt: "Front of a two-story home with sparkling dormer and porch windows",
-//      placeholder: houseFrontPlaceholderUrl }],
+// src/assets/carousel/clean-door.jpg and src/assets/carousel/house-front.jpg).
+// To bring one back, convert it to webp in that folder, add its name to
+// scripts/carousel-images.sh, run npm run images, and add a slide such as
+//   [carouselPhoto("house-front", "full", "A clean house front")],
 const HERO_SLIDES: (HeroPhoto[] | HeroStackSlide)[] = [
   {
     video: { src: workDemoUrl, poster: workDemoPosterUrl },
@@ -43,33 +80,55 @@ const HERO_SLIDES: (HeroPhoto[] | HeroStackSlide)[] = [
     // is only a backstop if it never plays, e.g. autoplay blocked.
     durationMs: 14000,
     stacked: [
-      {
-        src: lampBeforeUrl,
-        alt: "Before: a brick-mounted lantern with dusty, cloudy glass",
-        placeholder: lampBeforePlaceholderUrl,
-      },
-      {
-        src: lampAfterUrl,
-        alt: "After: the same lantern with clear, clean glass",
-        placeholder: lampAfterPlaceholderUrl,
-      },
+      carouselPhoto("lamp-before", "half", "Before: a brick-mounted lantern with dusty, cloudy glass"),
+      carouselPhoto("lamp-after", "half", "After: the same lantern with clear, clean glass"),
     ],
   },
   {
     stacked: [
-      { src: windowsBeforeUrl, alt: "Before: dusty, cloudy upper-story casement windows" },
-      { src: windowsAfterUrl, alt: "After: the same windows, clear and reflecting the sky" },
+      carouselPhoto("windows-before", "full", "Before: dusty, cloudy upper-story casement windows"),
+      carouselPhoto("windows-after", "full", "After: the same windows, clear and reflecting the sky"),
     ],
   },
   [
-    { src: poleGroundUrl, alt: "Cleaning a ground-floor window with a water-fed pole" },
-    { src: poleCleaningUrl, alt: "Cleaning second-story windows with a water-fed pole" },
+    carouselPhoto("pole-ground", "half", "Cleaning a ground-floor window with a water-fed pole"),
+    carouselPhoto("pole-cleaning", "half", "Cleaning second-story windows with a water-fed pole"),
   ],
-  [{ src: brickPorchUrl, alt: "Clean French doors and windows along a brick porch" }],
-  [{ src: teamUrl, alt: "The three Dolphin Bay window cleaners standing side by side in front of a home" }],
+  [carouselPhoto("brick-porch", "full", "Clean French doors and windows along a brick porch")],
+  [carouselPhoto("team", "full", "The three Dolphin Bay window cleaners standing side by side in front of a home")],
 ];
 
 const SLIDE_INTERVAL_MS = 6000;
+
+// A carousel photo over its blurred placeholder. The photo fades in once it
+// has loaded instead of painting top-down as the bytes arrive. Until `load`,
+// only the placeholder shows (no src, so nothing is fetched).
+function CarouselPhoto({ photo, eager, load }: { photo: HeroPhoto; eager: boolean; load: boolean }) {
+  const ref = useRef<HTMLImageElement>(null);
+  const [loaded, setLoaded] = useState(false);
+  // The first slide is in the prerendered HTML and can finish loading before
+  // React takes over, so its load event never reaches onLoad: check on mount.
+  useEffect(() => {
+    const img = ref.current;
+    if (img && img.complete && img.naturalWidth > 0) setLoaded(true);
+  }, [load]);
+  return (
+    <span className="carousel-photo" style={{ backgroundImage: `url(${photo.placeholder})` }}>
+      <img
+        ref={ref}
+        className={loaded ? "is-loaded" : undefined}
+        src={load ? photo.src : undefined}
+        srcSet={load ? photo.srcSet : undefined}
+        sizes={photo.sizes}
+        alt={photo.alt}
+        decoding="async"
+        loading={eager ? "eager" : "lazy"}
+        fetchPriority={eager ? "high" : undefined}
+        onLoad={() => setLoaded(true)}
+      />
+    </span>
+  );
+}
 
 function ChevronIcon({ dir }: { dir: "prev" | "next" }) {
   return (
@@ -175,13 +234,21 @@ function HeroCarousel() {
   const count = HERO_SLIDES.length;
   const go = (next: number) => setIndex((next + count) % count);
 
-  // Photos load as the carousel reaches them: the first two slides up front,
-  // then each next one as its predecessor shows. The hidden slides sit in the
-  // same grid cell as the visible one, so loading="lazy" alone would fetch
-  // every photo on page load.
-  const [reach, setReach] = useState(1);
+  // Photos load as the carousel reaches them: the showing slide right away,
+  // the one after it once the page's own load has finished (so it doesn't
+  // compete with the first slide's photos and video), then each next one as
+  // its predecessor shows. The hidden slides sit in the same grid cell as the
+  // visible one, so loading="lazy" alone would fetch every photo on page load.
+  const [reach, setReach] = useState(0);
   useEffect(() => {
-    setReach((r) => Math.max(r, index + 1));
+    setReach((r) => Math.max(r, index));
+    const ahead = () => setReach((r) => Math.max(r, index + 1));
+    if (document.readyState === "complete") {
+      ahead();
+      return;
+    }
+    window.addEventListener("load", ahead, { once: true });
+    return () => window.removeEventListener("load", ahead);
   }, [index]);
 
   // Auto-advance, unless the visitor is interacting with it or has asked
@@ -341,19 +408,7 @@ function HeroCarousel() {
         const isStack = !Array.isArray(slide);
         const video = Array.isArray(slide) ? undefined : slide.video;
         const renderPhoto = (photo: HeroPhoto) => (
-          <img
-            key={photo.src}
-            src={i <= reach ? photo.src : undefined}
-            alt={photo.alt}
-            decoding="async"
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : undefined}
-            style={
-              photo.placeholder
-                ? { backgroundImage: `url(${photo.placeholder})` }
-                : undefined
-            }
-          />
+          <CarouselPhoto key={photo.src} photo={photo} eager={i === 0} load={i <= reach} />
         );
         return (
           <div
