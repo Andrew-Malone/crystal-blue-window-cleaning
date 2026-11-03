@@ -263,7 +263,16 @@ select {
   transition: background 160ms ease;
 }
 
-/* On the quote page the bar's button is the phone number instead. */
+/* On the quote page the bar's button is the phone number instead; on narrow
+   screens it shrinks to the icon and "Call". */
+.nav-quote {
+  white-space: nowrap;
+}
+
+.nav-call-word {
+  display: none;
+}
+
 .nav-quote .contact-icon {
   width: 18px;
   height: 18px;
@@ -694,7 +703,6 @@ select {
     background 180ms ease;
 }
 
-.twin-button:hover,
 .twin-button:focus-visible {
   box-shadow: 2px 3px 0 var(--navy);
   transform: translate(3px, 3px);
@@ -744,7 +752,6 @@ select {
     background 180ms ease;
 }
 
-.quote-button:hover,
 .quote-button:focus-visible {
   background: var(--sea-green-light);
   box-shadow: 4px 5px 0 var(--navy);
@@ -861,7 +868,7 @@ select {
 
 .plans-lede {
   margin: 0;
-  font-size: clamp(1rem, 1.4vw, 1.12rem);
+  font-size: clamp(1.1rem, 1.6vw, 1.3rem);
   line-height: 1.6;
   color: var(--navy-soft);
 }
@@ -1027,7 +1034,6 @@ select {
     background 160ms ease;
 }
 
-.plan-cta:hover,
 .plan-cta:focus-visible {
   background: var(--sea-green-light);
   box-shadow: 2px 2px 0 var(--navy);
@@ -1039,7 +1045,6 @@ select {
   box-shadow: 4px 5px 0 var(--sea-green-deep);
 }
 
-.plan-card--featured .plan-cta:hover,
 .plan-card--featured .plan-cta:focus-visible {
   box-shadow: 2px 2px 0 var(--sea-green-deep);
 }
@@ -1507,7 +1512,6 @@ select {
     background 180ms ease;
 }
 
-.quote-call-button:hover,
 .quote-call-button:focus-visible {
   background: var(--sea-green-light);
   box-shadow: 3px 3px 0 var(--navy);
@@ -1798,7 +1802,6 @@ select {
     background 160ms ease;
 }
 
-.quote-submit button:hover:not(:disabled),
 .quote-submit button:focus-visible:not(:disabled) {
   background: var(--sea-green-light);
   box-shadow: 2px 3px 0 var(--navy);
@@ -2011,6 +2014,45 @@ textarea:focus {
   outline-offset: 2px;
 }
 
+
+/* The press-into-the-shadow effect is for pointers that can hover. On a
+   phone, a thumb scrolling over a button counts as hover and would shove the
+   button down mid-scroll (and leave it stuck there after a tap). */
+@media (hover: hover) {
+  .quote-button:hover {
+    background: var(--sea-green-light);
+    box-shadow: 4px 5px 0 var(--navy);
+    transform: translate(5px, 5px);
+  }
+
+  .twin-button:hover {
+    box-shadow: 2px 3px 0 var(--navy);
+    transform: translate(3px, 3px);
+  }
+
+  .plan-cta:hover {
+    background: var(--sea-green-light);
+    box-shadow: 2px 2px 0 var(--navy);
+    transform: translate(2px, 3px);
+  }
+
+  .plan-card--featured .plan-cta:hover {
+    box-shadow: 2px 2px 0 var(--sea-green-deep);
+  }
+
+  .quote-call-button:hover {
+    background: var(--sea-green-light);
+    box-shadow: 3px 3px 0 var(--navy);
+    transform: translate(3px, 4px);
+  }
+
+  .quote-submit button:hover:not(:disabled) {
+    background: var(--sea-green-light);
+    box-shadow: 2px 3px 0 var(--navy);
+    transform: translate(3px, 3px);
+  }
+}
+
 /* ---------- responsive ---------- */
 
 @media (max-width: 940px) {
@@ -2102,6 +2144,15 @@ textarea:focus {
   .nav-quote {
     padding: 7px 14px;
     font-size: 0.92rem;
+  }
+
+  /* The full number no longer fits beside the brand; just "Call". */
+  .nav-call-number {
+    display: none;
+  }
+
+  .nav-call-word {
+    display: inline;
   }
 
   .quote-button {

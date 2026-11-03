@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { GOOGLE_REVIEWS_URL, FACEBOOK_URL, PHONE_DISPLAY, PHONE_TEL, FacebookIcon, PhoneIcon, QuoteButton, StarRow } from "../shared";
+import { GOOGLE_REVIEWS_URL, FACEBOOK_URL, PHONE_DISPLAY, PHONE_TEL, FacebookIcon, PhoneIcon, PlanIcon, QuoteButton, StarRow } from "../shared";
 import poleGroundUrl from "../assets/carousel/pole-ground.webp";
 import poleCleaningUrl from "../assets/carousel/pole-cleaning.webp";
 import brickPorchUrl from "../assets/carousel/brick-porch.webp";
@@ -463,7 +463,8 @@ export function Hero() {
               <span>{PHONE_DISPLAY}</span>
             </a>
             <a className="twin-button" href="#plans">
-              Service plans
+              <PlanIcon />
+              <span>Service plans</span>
             </a>
           </div>
         </div>

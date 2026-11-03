@@ -77,6 +77,23 @@ export function PhoneIcon() {
   );
 }
 
+// A calendar with three visit dots: the service-plan glyph, drawn solid so it
+// matches the phone icon beside it.
+export function PlanIcon() {
+  return (
+    <svg className="contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1zm13 8H4v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8z"
+      />
+      <circle cx="8" cy="14.5" r="1.6" fill="currentColor" />
+      <circle cx="12" cy="14.5" r="1.6" fill="currentColor" />
+      <circle cx="16" cy="14.5" r="1.6" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function MailIcon() {
   return (
     <svg className="contact-icon" viewBox="0 0 24 24" aria-hidden="true">

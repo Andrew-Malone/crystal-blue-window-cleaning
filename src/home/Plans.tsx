@@ -32,10 +32,7 @@ export function Plans() {
         <div className="plans-intro" data-reveal>
           <h2 className="section-title">Service plans</h2>
           <p className="plans-lede">
-            Pick how often you'd like us to come by, and we take a set amount off
-            every visit. The price itself is set at your home, the same as a
-            one-time clean, so choose a rhythm now and we'll confirm the number
-            when we see your windows.
+            The more often we come by, the more we take off every visit.
           </p>
         </div>
 

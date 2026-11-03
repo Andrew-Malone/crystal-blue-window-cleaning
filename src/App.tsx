@@ -27,9 +27,10 @@ function SiteNav({ page }: { page: "home" | "quote" }) {
       </div>
 
       {page === "quote" ? (
-        <a className="nav-quote" href={PHONE_TEL}>
+        <a className="nav-quote nav-quote--call" href={PHONE_TEL} aria-label={`Call ${PHONE_DISPLAY}`}>
           <PhoneIcon />
-          <span>{PHONE_DISPLAY}</span>
+          <span className="nav-call-number">{PHONE_DISPLAY}</span>
+          <span className="nav-call-word">Call</span>
         </a>
       ) : (
         <a className="nav-quote" href={QUOTE_PATH}>
