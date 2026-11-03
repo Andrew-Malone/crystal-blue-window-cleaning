@@ -67,32 +67,36 @@ export function DateField({
   onChange: (value: string) => void;
 }) {
   const hintId = `${useId()}-hint`;
-  const [today] = useState(() => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  });
-  // Requests need confirming first, so same-day isn't offered.
-  const earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-  // Only ever rendered in the browser (the quote dialog mounts its form on
-  // open), so reading matchMedia up front is safe.
-  const [custom] = useState(
-    () =>
-      window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
-      "popover" in HTMLElement.prototype,
-  );
+  // The quote page is prerendered at build time, so anything that depends on
+  // the browser (the date, the pointer type) is read after mount. Until then
+  // it renders as a plain date input with no minimum, which is what the
+  // baked HTML holds and what hydration expects.
+  const [today, setToday] = useState<Date>();
+  const [custom, setCustom] = useState(false);
 
   useEffect(() => {
-    if (custom) void loadCalendar();
-  }, [custom]);
+    const now = new Date();
+    setToday(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+    const wantsCustom =
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+      "popover" in HTMLElement.prototype;
+    setCustom(wantsCustom);
+    if (wantsCustom) void loadCalendar();
+  }, []);
 
-  if (!custom) {
+  // Requests need confirming first, so same-day isn't offered.
+  const earliest = today
+    ? new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
+    : undefined;
+
+  if (!custom || !today || !earliest) {
     return (
       <label>
         <span>{label}</span>
         <input
           name={name}
           type="date"
-          min={toValue(earliest)}
+          min={earliest ? toValue(earliest) : undefined}
           value={value}
           aria-describedby={hint ? hintId : undefined}
           onChange={(event) => onChange(event.target.value)}

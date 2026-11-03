@@ -24,15 +24,6 @@
 }
 
 @font-face {
-  font-family: "Playfair Display Fallback";
-  font-weight: 700;
-  src: local("Georgia Bold"), local("Georgia-Bold");
-  ascent-override: 123.69%;
-  descent-override: 28.69%;
-  size-adjust: 87.48%;
-}
-
-@font-face {
   font-family: "IBM Plex Sans Fallback";
   font-weight: 400 500;
   src: local("Arial"), local("ArialMT");
@@ -79,6 +70,10 @@
   --sea-green-light: #3cc48e;
   --sea-green-deep: #17754f;
   --gold: #f0b429;
+  /* Dollar-bill green, only for the saving on the quote page's plan box;
+     distinct from --sea-green so the money reads as money. */
+  --bill-green: #1f8a4c;
+  --bill-tint: #e1f3e5;
   /* Height of the sticky nav, subtracted from the hero so the hero fills the
      first screen exactly and the next section starts below the fold. Must
      match the rendered bar: 52px brand mark + 2 x 16px padding. */
@@ -93,8 +88,7 @@
      is a system font resized to the web font's metrics, so text doesn't
      reflow when the real font swaps in. */
   --display: "Bitter Variable", "Bitter Fallback", Georgia, "Times New Roman", serif;
-  /* Used only for the hero headline. */
-  --display-hero: "Playfair Display", "Playfair Display Fallback", Georgia, "Times New Roman", serif;
+  /* Also carries the hero headline, in bold. */
   --body: "IBM Plex Sans Variable", "IBM Plex Sans Fallback", Arial, sans-serif;
 
   color: var(--navy);
@@ -117,10 +111,14 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* A modal <dialog> blocks clicks on the page but not scrolling; freeze the
-   page behind it while it's open. */
-html:has(.quote-dialog[open]) {
+/* Visually hidden, still read out. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 /* Keep in-page jumps from landing under the sticky nav. */
@@ -248,6 +246,9 @@ select {
 /* A small cousin of .quote-button. Kept under 52px tall so the bar still
    matches --nav-h. */
 .nav-quote {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   flex: none;
   padding: 11px 20px;
   border: 2px solid var(--navy);
@@ -257,8 +258,16 @@ select {
   font-family: var(--display);
   font-size: 1rem;
   font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
   transition: background 160ms ease;
+}
+
+/* On the quote page the bar's button is the phone number instead. */
+.nav-quote .contact-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--navy);
 }
 
 .nav-quote:hover,
@@ -278,13 +287,14 @@ select {
   min-height: calc(100vh - var(--nav-h));
   gap: clamp(30px, 4.5vw, 66px);
   padding: clamp(30px, 5vh, 60px) var(--gutter) clamp(40px, 6vh, 76px);
-  /* Pensacola Bay and the Bay Bridge (Skarz, CC0, no credit required).
-     Vite resolves and fingerprints this url() at build time, so the asset is
-     hashed like any other import.
+  /* Pensacola Bay and the Bay Bridge (Skarz, CC0, no credit required),
+     resized to 1600px so it costs under 90 KB. Vite resolves and
+     fingerprints this url() at build time, so the asset is hashed like any
+     other import; scripts/prerender.js preloads it.
      Alternate kept on hand: ./assets/navarre-beach-pier.webp (Taminar,
      CC BY-SA 4.0). It needs a footer credit if it's swapped in:
      https://commons.wikimedia.org/wiki/File:Navarre_Beach_Pier_IGP2095.jpg */
-  /* The second layer is a 32px blurred copy of the photo (small enough for
+  /* The second layer is a tiny blurred copy of the photo (small enough for
      Vite to inline), so the bay's colours show while the full image loads. */
   background-color: var(--seafoam);
   background-image:
@@ -526,16 +536,15 @@ select {
   box-shadow: 12px 14px 0 var(--navy);
 }
 
+/* Bold sans, all caps: the body face at its heaviest weight, tracked in
+   tight so the two lines read as one block rather than a row of letters. */
 .hero h1 {
   margin: 0;
-  font-family: var(--display-hero);
-  font-optical-sizing: auto;
-  /* All caps needs positive tracking to breathe, and runs wider than title
-     case, so it sits a step smaller than the mixed-case size did. */
-  font-size: clamp(2.1rem, 4.7vw, 4.1rem);
+  font-family: var(--body);
+  font-size: clamp(2.2rem, 4.9vw, 4.2rem);
   font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: 0.012em;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
   text-transform: uppercase;
   color: var(--navy);
 }
@@ -648,6 +657,66 @@ select {
   }
 }
 
+/* Quote on top, then the call and plans buttons as a matched pair. All three
+   share the hero's width budget. */
+.hero-actions {
+  display: grid;
+  gap: 16px;
+  width: min(440px, 100%);
+}
+
+.hero-twins {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.twin-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 62px;
+  padding: 10px 16px;
+  border: 3px solid var(--navy);
+  border-radius: 999px;
+  color: var(--navy);
+  font-family: var(--display);
+  font-size: clamp(1.02rem, 1.5vw, 1.14rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: 5px 6px 0 var(--navy);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.twin-button:hover,
+.twin-button:focus-visible {
+  box-shadow: 2px 3px 0 var(--navy);
+  transform: translate(3px, 3px);
+}
+
+/* Same green as the quote button above them: a navy fill here sat on the
+   navy shadow and the two blurred together. Size alone sets the hierarchy. */
+.twin-button {
+  background: var(--sea-green);
+}
+
+.twin-button:hover,
+.twin-button:focus-visible {
+  background: var(--sea-green-light);
+}
+
+.twin-button .contact-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--navy);
+}
+
 /* The big CTA: hard navy outline + offset shadow, pressing into the shadow on
    hover. Used in the hero and again at the foot of the page. */
 .quote-button {
@@ -666,6 +735,7 @@ select {
   font-size: clamp(1.9rem, 4vw, 2.9rem);
   font-weight: 700;
   letter-spacing: -0.05em;
+  text-decoration: none;
   cursor: pointer;
   box-shadow: 9px 10px 0 var(--navy);
   transition:
@@ -726,7 +796,9 @@ select {
   background: var(--seafoam);
 }
 
-.section:nth-of-type(even) {
+/* Odd sections take the paler band: the hero above is seafoam, so the first
+   section (plans) needs to break from it. */
+.section:nth-of-type(odd) {
   background: var(--seafoam-band);
 }
 
@@ -745,24 +817,21 @@ select {
   color: var(--navy);
 }
 
-/* Three-up grid used by the review cards, the about points and the FAQ. */
+/* Three-up grid used by the review cards and the about points. */
 .reviews-grid,
-.about-grid,
-.faq-list {
+.about-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(24px, 3vw, 42px);
 }
 
-/* Navy-ruled column, shared by the about points and FAQ items. */
-.about-point,
-.faq-item {
+/* Navy-ruled column. */
+.about-point {
   padding-top: 20px;
   border-top: 3px solid var(--navy);
 }
 
-.about-point h3,
-.faq-item dt {
+.about-point h3 {
   margin: 0 0 10px;
   font-family: var(--display);
   font-size: clamp(1.12rem, 1.8vw, 1.32rem);
@@ -772,12 +841,312 @@ select {
   color: var(--navy);
 }
 
-.about-point p,
-.faq-item dd {
+.about-point p {
   margin: 0;
   font-size: 0.96rem;
   line-height: 1.6;
   color: var(--navy-soft);
+}
+
+/* ---------- service plans ---------- */
+
+.plans-intro {
+  max-width: 62ch;
+  margin-bottom: var(--heading-gap);
+}
+
+.plans .section-title {
+  margin-bottom: 16px;
+}
+
+.plans-lede {
+  margin: 0;
+  font-size: clamp(1rem, 1.4vw, 1.12rem);
+  line-height: 1.6;
+  color: var(--navy-soft);
+}
+
+/* Podium: the quarterly card in the middle stands taller than its
+   neighbours (negative top margin, more padding) while all three bottoms
+   line up. */
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 2.8vw, 34px);
+  padding-top: 28px;
+}
+
+.plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 26px 26px;
+  border: 3px solid var(--navy);
+  border-radius: 20px;
+  background: #f8f4ea;
+  color: var(--navy);
+  box-shadow: 8px 9px 0 var(--navy);
+}
+
+/* The one loud thing in the section: navy card, green offset shadow. */
+.plan-card--featured {
+  margin-top: -28px;
+  padding-top: 44px;
+  padding-bottom: 34px;
+  background: var(--navy);
+  color: var(--seafoam-tint);
+  box-shadow: 10px 12px 0 var(--sea-green);
+}
+
+.plan-badge {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  padding: 7px 16px;
+  border: 3px solid var(--navy);
+  border-radius: 999px;
+  background: var(--sea-green);
+  color: var(--navy);
+  font-family: var(--display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.plan-card h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 2.2vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+/* A year as twelve cells; the filled ones are visits. */
+.year-strip {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 4px;
+  margin: 16px 0 22px;
+}
+
+.year-strip span {
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(12, 35, 64, 0.12);
+}
+
+.year-strip .is-visit {
+  background: var(--sea-green);
+}
+
+.plan-card--featured .year-strip span {
+  background: rgba(232, 241, 231, 0.16);
+}
+
+.plan-card--featured .year-strip .is-visit {
+  background: var(--sea-green-light);
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 26px;
+}
+
+.plan-price b {
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 4vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.plan-card--featured .plan-price b {
+  color: var(--sea-green-light);
+}
+
+.plan-price span {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.plan-includes {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-includes li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.plan-includes svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  fill: none;
+  stroke: var(--sea-green-deep);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.plan-card--featured .plan-includes svg {
+  stroke: var(--sea-green-light);
+}
+
+.plan-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  margin-top: auto;
+  padding: 10px 18px;
+  border: 2px solid var(--navy);
+  border-radius: 999px;
+  background: var(--sea-green);
+  color: var(--navy);
+  font-family: var(--display);
+  font-size: 1.06rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 4px 5px 0 var(--navy);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.plan-cta:hover,
+.plan-cta:focus-visible {
+  background: var(--sea-green-light);
+  box-shadow: 2px 2px 0 var(--navy);
+  transform: translate(2px, 3px);
+}
+
+.plan-card--featured .plan-cta {
+  border-color: var(--sea-green-deep);
+  box-shadow: 4px 5px 0 var(--sea-green-deep);
+}
+
+.plan-card--featured .plan-cta:hover,
+.plan-card--featured .plan-cta:focus-visible {
+  box-shadow: 2px 2px 0 var(--sea-green-deep);
+}
+
+/* ---------- faq ---------- */
+
+.faq-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 clamp(28px, 4vw, 56px);
+  align-items: start;
+}
+
+.faq-list {
+  display: grid;
+}
+
+.faq-item {
+  border-top: 3px solid var(--navy);
+}
+
+.faq-list .faq-item:last-child {
+  border-bottom: 3px solid var(--navy);
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  list-style: none;
+  font-family: var(--display);
+  font-size: clamp(1.06rem, 1.6vw, 1.2rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Plus that turns into a minus when the answer is open. */
+.faq-toggle {
+  position: relative;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--navy);
+  border-radius: 50%;
+  transition: background 160ms ease;
+}
+
+.faq-toggle::before,
+.faq-toggle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  background: var(--navy);
+  transform: translate(-50%, -50%);
+  transition: transform 200ms ease;
+}
+
+.faq-toggle::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.faq-item[open] .faq-toggle {
+  background: var(--sea-green);
+}
+
+.faq-item[open] .faq-toggle::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.faq-item summary:hover .faq-toggle {
+  background: var(--sea-green-light);
+}
+
+.faq-item p {
+  max-width: 54ch;
+  margin: -4px 0 20px;
+  font-size: 0.96rem;
+  line-height: 1.6;
+  color: var(--navy-soft);
+}
+
+.faq-item p a {
+  font-weight: 600;
+}
+
+.faq-more {
+  margin: clamp(30px, 4.5vh, 44px) 0 0;
+  text-align: center;
+  font-size: 0.98rem;
+  color: var(--navy-soft);
+}
+
+.faq-more a {
+  font-weight: 600;
+  color: var(--navy);
 }
 
 /* Scroll reveal: useReveal() adds .is-revealed as each element enters the
@@ -1042,141 +1411,411 @@ select {
   color: inherit;
 }
 
-/* ---------- quote dialog ---------- */
+/* ---------- quote page ---------- */
 
-.quote-dialog {
-  width: min(540px, calc(100% - 28px));
-  max-height: calc(100svh - 40px);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  overflow: visible;
-  color: var(--navy);
+.quote-page {
+  padding: clamp(40px, 7vh, 80px) var(--gutter) clamp(60px, 9vh, 104px);
+  background: var(--seafoam);
 }
 
-.quote-dialog::backdrop {
-  background: rgba(7, 29, 61, 0.66);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.quote-card-shell {
-  position: relative;
-}
-
-.quote-card {
-  position: relative;
+/* Intro on the left, form on the right; both scroll with the page. */
+.quote-layout {
   display: grid;
-  gap: 24px;
-  width: 100%;
-  max-height: calc(100svh - 40px);
-  overflow-y: auto;
-  padding: clamp(24px, 3.4vw, 34px);
-  border: 3px solid var(--navy);
-  border-radius: 18px;
-  background: var(--seafoam-tint);
-  box-shadow: 10px 12px 0 var(--navy);
-  animation: quoteEnter 0.32s ease both;
-  /* When the card does scroll, reaching its end shouldn't hand the scroll on
-     to the page. */
-  overscroll-behavior: contain;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+  max-width: var(--content-w);
+  margin: 0 auto;
 }
 
-/* On shorter windows (most laptops) the full-size form ran a few pixels past
-   the card's max-height, so it scrolled and the scrollbar flashed on open.
-   Tighten the vertical rhythm so it fits; really short screens still scroll. */
-@media (max-height: 820px) {
-  .quote-card {
-    gap: 16px;
-    padding-block: 20px;
-  }
-
-  .quote-card .step-content {
-    gap: 16px;
-  }
-
-  /* rows={3} sets the height; two lines still shows the whole placeholder. */
-  .quote-card textarea {
-    min-height: 0;
-    height: 72px;
-  }
-}
-
-.dialog-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(7, 29, 61, 0.1);
-  color: var(--navy);
-  font-size: 1.25rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.dialog-close:hover {
-  background: rgba(7, 29, 61, 0.2);
-}
-
-.quote-card h2 {
+.quote-intro h1 {
   margin: 0;
-  color: var(--navy);
   font-family: var(--display);
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-  font-weight: 600;
-  line-height: 1.05;
+  font-size: clamp(2.2rem, 4.4vw, 3.3rem);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--navy);
 }
 
-.form-heading {
+.quote-lede {
+  max-width: 44ch;
+  margin: 18px 0 0;
+  font-size: clamp(1rem, 1.4vw, 1.1rem);
+  line-height: 1.6;
+  color: var(--navy-soft);
+}
+
+/* What happens after they send the form. A real sequence, so it's numbered. */
+.quote-steps {
+  display: grid;
+  gap: 20px;
+  margin: clamp(28px, 4vh, 40px) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.quote-steps li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 18px;
+  counter-increment: step;
+  font-family: var(--display);
+  font-size: clamp(1.2rem, 1.8vw, 1.4rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--navy);
 }
 
-.step-track {
-  display: flex;
-  gap: 6px;
-  flex: none;
-  padding-right: 44px;
-}
-
-.step-track span {
-  width: 22px;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(7, 29, 61, 0.16);
-  transition: background 200ms ease;
-}
-
-.step-track span.is-active {
-  background: var(--sea-green);
-}
-
-/* The frame clips to animate its height between steps, and its height comes
-   from .step-content's scrollHeight. Buttons carry a 4px/5px offset shadow
-   that scrollHeight doesn't account for, so the last row's shadow was being
-   sliced off. Padding on .step-content is measured, so it buys vertical room;
-   the negative margin/padding pair widens the clip box without narrowing the
-   fields inside it. */
-.step-frame {
-  overflow: hidden;
-  margin-inline: -8px;
-  padding-inline: 8px;
-  transition: height 280ms ease;
-}
-
-.step-content {
+.quote-steps li::before {
+  content: counter(step);
   display: grid;
-  gap: 26px;
-  padding-bottom: 8px;
-  animation: stepContentEnter 220ms ease both;
+  flex: none;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border: 3px solid var(--navy);
+  border-radius: 50%;
+  background: #f8f4ea;
+  font-size: 1.3rem;
+  font-weight: 700;
+  box-shadow: 4px 4px 0 var(--navy);
+}
+
+/* The phone alternative, as loud as the form's own submit button. */
+.quote-call-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 64px;
+  margin-top: clamp(28px, 4vh, 40px);
+  padding: 12px 26px;
+  border: 3px solid var(--navy);
+  border-radius: 999px;
+  background: var(--sea-green);
+  color: var(--navy);
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 6px 7px 0 var(--navy);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.quote-call-button:hover,
+.quote-call-button:focus-visible {
+  background: var(--sea-green-light);
+  box-shadow: 3px 3px 0 var(--navy);
+  transform: translate(3px, 4px);
+}
+
+.quote-call-button .contact-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--navy);
+}
+
+.quote-form {
+  display: grid;
+  gap: 32px;
+  padding: clamp(24px, 3.4vw, 40px);
+  border: 3px solid var(--navy);
+  border-radius: 20px;
+  background: #f8f4ea;
+  color: var(--navy);
+  box-shadow: 10px 12px 0 var(--navy);
+}
+
+.quote-form--sent {
+  gap: 16px;
+}
+
+.quote-form--sent h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.quote-form--sent p {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--navy-soft);
+}
+
+.quote-form--sent a {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.quote-form-home {
+  justify-self: start;
+  margin-top: 8px;
+  padding: 12px 22px;
+  border: 2px solid var(--navy);
+  border-radius: 999px;
+  font-family: var(--display);
+  text-decoration: none;
+  box-shadow: 4px 5px 0 var(--navy);
+}
+
+/* Everything on the form reads at body size or larger: the labels, the
+   typed text and the chips. */
+.quote-form label,
+.quote-form .date-field,
+.chip-field legend {
+  font-size: 1rem;
+}
+
+.quote-form input,
+.quote-form textarea,
+.quote-form .date-field-button {
+  font-size: 1.06rem;
+}
+
+.quote-form input,
+.quote-form .date-field-button {
+  height: 54px;
+}
+
+/* Tap-to-select options: a legend, then a wrapping row of chips. */
+.chip-field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.chip-field legend {
+  padding: 0;
+  margin-bottom: 14px;
+  color: var(--navy-mid);
+  font-weight: 700;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 54px;
+  padding: 12px 22px;
+  border: 2px solid rgba(12, 35, 64, 0.3);
+  border-radius: 999px;
+  background: white;
+  color: var(--navy);
+  font-family: var(--body);
+  font-size: 1.06rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.chip:hover {
+  border-color: var(--navy);
+}
+
+.chip.is-selected {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: var(--seafoam-tint);
+}
+
+/* Dollar-bill green for money, wherever it appears on the form. */
+.plan-money {
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--bill-green);
+}
+
+/* The other plans: the saving leads, the plan name under it. */
+.chip--plan {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  min-height: 72px;
+  padding: 12px 22px;
+  border-radius: 18px;
+}
+
+.chip--plan .plan-money {
+  font-size: 1.5rem;
+}
+
+.chip--plan span {
+  font-size: 0.98rem;
+}
+
+.chip--plan.is-selected .plan-money {
+  color: var(--sea-green-light);
+}
+
+/* The quarterly plan: a checkbox card, checked by default, with the saving
+   as its headline so unticking it reads as giving money back. */
+.plan-check {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 12px;
+  padding: 20px 22px;
+  border: 3px solid rgba(12, 35, 64, 0.3);
+  border-radius: 18px;
+  background: white;
+  color: var(--navy);
+  font-weight: 400;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.plan-check.is-checked {
+  border-color: var(--navy);
+  background: var(--bill-tint);
+  box-shadow: 6px 7px 0 var(--navy);
+}
+
+.plan-check:hover {
+  border-color: var(--navy);
+}
+
+/* The native box does the work (keyboard, screen readers); the drawn one
+   shows it. */
+.plan-check input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.plan-check-box {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--navy);
+  border-radius: 10px;
+  background: white;
+  transition: background 140ms ease;
+}
+
+.plan-check-box svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: white;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 140ms ease,
+    transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.plan-check.is-checked .plan-check-box {
+  background: var(--navy);
+}
+
+.plan-check.is-checked .plan-check-box svg {
+  opacity: 1;
+  transform: none;
+}
+
+.plan-check input:focus-visible ~ .plan-check-box {
+  outline: 2px solid var(--sea-green-deep);
+  outline-offset: 2px;
+}
+
+.plan-check-text {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.plan-check-text .plan-money {
+  font-size: clamp(1.7rem, 2.6vw, 2.2rem);
+  transition: color 160ms ease;
+}
+
+.plan-check-text span {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Unticked, the saving fades: that's the money being handed back. */
+.plan-check:not(.is-checked) .plan-money {
+  color: rgba(12, 35, 64, 0.38);
+}
+
+.field-grid--address {
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+}
+
+.quote-submit {
+  display: grid;
+  gap: 12px;
+}
+
+.quote-submit button {
+  min-height: 66px;
+  border: 3px solid var(--navy);
+  border-radius: 999px;
+  background: var(--sea-green);
+  color: var(--navy);
+  font-family: var(--display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 5px 6px 0 var(--navy);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.quote-submit button:hover:not(:disabled),
+.quote-submit button:focus-visible:not(:disabled) {
+  background: var(--sea-green-light);
+  box-shadow: 2px 3px 0 var(--navy);
+  transform: translate(3px, 3px);
+}
+
+.quote-submit button:disabled {
+  border-color: rgba(7, 29, 61, 0.25);
+  background: rgba(7, 29, 61, 0.1);
+  color: rgba(7, 29, 61, 0.42);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.quote-submit .field-hint {
+  margin: 0;
+  text-align: center;
 }
 
 .form-status {
@@ -1196,31 +1835,8 @@ select {
   color: #b3261e;
 }
 
-.step-content > button {
-  margin-top: 4px;
-}
-
-.is-flash input,
-.is-flash select,
-.is-flash .segmented-control button {
-  animation: fieldFlash 600ms ease;
-}
-
-.is-flash > span:first-child {
-  color: #b3261e;
-}
-
-@keyframes fieldFlash {
-  0%,
-  100% {
-    border-color: rgba(7, 29, 61, 0.18);
-    box-shadow: none;
-  }
-  25%,
-  75% {
-    border-color: #d33a30;
-    box-shadow: 0 0 0 3px rgba(211, 58, 48, 0.22);
-  }
+.form-status--error a {
+  font-weight: 600;
 }
 
 .field-grid {
@@ -1236,55 +1852,6 @@ label,
   color: var(--navy-mid);
   font-size: 0.88rem;
   font-weight: 700;
-}
-
-.service-field {
-  display: grid;
-  gap: 8px;
-  color: var(--navy-mid);
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
-.segmented-control {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-/* Scoped past `.quote-card button` below, which would otherwise paint every
-   unselected option green. */
-.quote-card .segmented-control button {
-  min-height: 48px;
-  border: 1px solid rgba(7, 29, 61, 0.2);
-  background: white;
-  color: var(--navy-mid);
-  font-family: var(--body);
-  font-size: 0.94rem;
-  font-weight: 600;
-  box-shadow: none;
-}
-
-.quote-card .segmented-control button.is-selected {
-  border-color: var(--navy);
-  background: var(--navy);
-  color: var(--seafoam-tint);
-}
-
-/* These are options, not primary actions: a green hover followed by a navy
-   selected state read as two unrelated colours for one interaction. Hover
-   just firms up the navy the selected state uses. */
-.quote-card .segmented-control button:hover:not(:disabled) {
-  background: #ffffff;
-  border-color: var(--navy);
-  color: var(--navy);
-  transform: none;
-  box-shadow: none;
-}
-
-.quote-card .segmented-control button.is-selected:hover:not(:disabled) {
-  background: var(--navy);
-  color: var(--seafoam-tint);
 }
 
 input,
@@ -1439,95 +2006,9 @@ textarea:focus {
   border-color: var(--sea-green-deep);
 }
 
-.button-row {
-  display: grid;
-  grid-template-columns: minmax(110px, 0.48fr) 1fr;
-  gap: 12px;
-}
-
-/* No Back button alongside it, so submit takes the full width. */
-.button-row--single {
-  grid-template-columns: 1fr;
-}
-
-.quote-card button:where(:not(.date-field *)) {
-  position: relative;
-  min-height: 52px;
-  border: 2px solid var(--navy);
-  border-radius: 10px;
-  background: var(--sea-green);
-  color: var(--navy);
-  font-family: var(--display);
-  font-size: 1.08rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 4px 5px 0 var(--navy);
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
-}
-
-.quote-card button:where(:not(.date-field *)):hover:not(:disabled) {
-  background: var(--sea-green-light);
-  box-shadow: 2px 2px 0 var(--navy);
-  transform: translate(2px, 3px);
-}
-
-.quote-card .secondary-button {
-  background: transparent;
-  color: var(--navy-mid);
-  box-shadow: 3px 4px 0 rgba(7, 29, 61, 0.35);
-}
-
-.quote-card .dialog-close {
-  min-height: 0;
-  border: 0;
-  box-shadow: none;
-  font-family: var(--body);
-  transform: none;
-}
-
-.quote-card button:where(:not(.date-field *)):disabled {
-  border-color: rgba(7, 29, 61, 0.25);
-  background: rgba(7, 29, 61, 0.1);
-  color: rgba(7, 29, 61, 0.42);
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
 :focus-visible {
   outline: 2px solid var(--sea-green-deep);
   outline-offset: 2px;
-}
-
-/* Inside the form the ring is drawn *inside* the control's own box. The step
-   frame is overflow:hidden to animate its height, and the fields run its full
-   width, so any ring sitting outside the box gets clipped at the edges. */
-.quote-card :focus-visible {
-  outline-offset: -2px;
-}
-
-@keyframes quoteEnter {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes stepContentEnter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* ---------- responsive ---------- */
@@ -1563,8 +2044,21 @@ textarea:focus {
   .about-intro,
   .reviews-grid,
   .about-grid,
-  .faq-list {
+  .faq-columns,
+  .plans-grid,
+  .quote-layout {
     grid-template-columns: 1fr;
+  }
+
+  /* Stacked, the quarterly card leads and sits level with the others. */
+  .plans-grid {
+    padding-top: 0;
+    gap: 36px;
+  }
+
+  .plan-card--featured {
+    order: -1;
+    margin-top: 18px;
   }
 
   .contact-main {
@@ -1621,23 +2115,39 @@ textarea:focus {
     height: 54px;
   }
 
-  .field-grid {
+  /* Side by side they'd squeeze the phone number; stack them. */
+  .hero-actions {
+    width: 100%;
+  }
+
+  .hero-twins {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .field-grid,
+  .field-grid--address {
+    grid-template-columns: 1fr;
+  }
+
+  .quote-call-button {
+    width: 100%;
+  }
+
+  /* Keeps "−$100 every visit" on one line in the box. */
+  .plan-check {
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .plan-check-text .plan-money {
+    font-size: 1.45rem;
   }
 }
 
 @media (max-width: 400px) {
   .brand-name span {
     display: none;
-  }
-
-  .button-row {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .button-row .secondary-button {
-    order: 1;
   }
 }
 
